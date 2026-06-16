@@ -23,7 +23,7 @@ export function DataUnification() {
       <div className="container-content relative">
         <div className="max-w-3xl mb-16 lg:mb-20">
           <p className="section-kicker">O problema invisível</p>
-          <h2 className="mt-5 text-display-lg text-ink">
+          <h2 aria-label="Seus dados não podem viver espalhados." className="mt-5 text-display-lg text-ink">
             Seus dados não podem
             <span className="block text-ink-muted">viver espalhados.</span>
           </h2>

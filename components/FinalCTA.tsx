@@ -45,7 +45,7 @@ export function FinalCTA() {
               }`}
             >
               <p className="section-kicker">Próximo passo</p>
-              <h2 className="mt-5 text-display-lg text-ink">
+              <h2 aria-label="Se faz sentido pra você, faz sentido pra gente." className="mt-5 text-display-lg text-ink">
                 Se faz sentido pra você,
                 <span className="block text-ink-muted">faz sentido pra gente.</span>
               </h2>
@@ -88,7 +88,7 @@ export function FinalCTA() {
                   { step: '04', label: 'Se fizer sentido, proposta detalhada em 5 dias' },
                 ].map((s) => (
                   <li key={s.step} className="flex items-start gap-4">
-                    <span className="font-mono text-[0.7rem] tracking-[0.12em] text-accent pt-1">
+                    <span className="font-mono text-[0.7rem] tracking-[0.12em] text-accent-hover pt-1">
                       {s.step}
                     </span>
                     <span className="text-sm text-ink-muted leading-relaxed">{s.label}</span>

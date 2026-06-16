@@ -53,14 +53,14 @@ export function InsightsSection() {
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
           <div className="max-w-2xl">
             <p className="section-kicker">Insights</p>
-            <h2 className="mt-5 text-display-lg text-ink">
+            <h2 aria-label="Conhecimento aplicado. Antes de publicado." className="mt-5 text-display-lg text-ink">
               Conhecimento aplicado.
               <span className="block text-ink-muted">Antes de publicado.</span>
             </h2>
           </div>
           <Link
             href="/insights"
-            className="link-underline group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-[0.12em] text-accent self-start lg:self-end"
+            className="link-underline group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-[0.12em] text-accent-hover self-start lg:self-end"
           >
             Todos os insights
             <svg

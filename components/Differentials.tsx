@@ -59,7 +59,7 @@ export function Differentials() {
           {/* Coluna texto — 5/12 */}
           <div className="lg:col-span-5 lg:sticky lg:top-32">
             <p className="section-kicker">Por que somos diferentes</p>
-            <h2 className="mt-5 text-display-lg text-ink">
+            <h2 aria-label="Engenharia de verdade, não suporte de gravata." className="mt-5 text-display-lg text-ink">
               Engenharia de verdade,
               <span className="block text-ink-muted">não suporte de gravata.</span>
             </h2>

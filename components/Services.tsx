@@ -70,7 +70,7 @@ export function Services() {
         {/* Header */}
         <div className="max-w-3xl mb-16 lg:mb-20">
           <p className="section-kicker">Cinco frentes · Um único parceiro</p>
-          <h2 className="mt-5 text-display-lg text-ink">
+          <h2 aria-label="Não é uma agência. É um time embedded." className="mt-5 text-display-lg text-ink">
             Não é uma agência.
             <span className="block text-ink-muted">É um time embedded.</span>
           </h2>

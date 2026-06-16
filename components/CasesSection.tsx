@@ -65,14 +65,14 @@ export function CasesSection() {
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
           <div className="max-w-2xl">
             <p className="section-kicker">Trabalhos recentes</p>
-            <h2 className="mt-5 text-display-lg text-ink">
+            <h2 aria-label="Sistemas em produção, clientes em operação." className="mt-5 text-display-lg text-ink">
               Sistemas em produção,
               <span className="block text-ink-muted">clientes em operação.</span>
             </h2>
           </div>
           <Link
             href="/cases"
-            className="link-underline group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-[0.12em] text-accent self-start lg:self-end"
+            className="link-underline group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-[0.12em] text-accent-hover self-start lg:self-end"
           >
             Ver todos os cases
             <svg

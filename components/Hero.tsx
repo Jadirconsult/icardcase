@@ -131,7 +131,7 @@ export function Hero() {
         </div>
 
         {/* Headline display-xl — entra com stagger, tracking negativo agressivo */}
-        <h1 className="mt-8 max-w-[18ch] text-display-xl text-ink">
+        <h1 aria-label="Tecnologia que conecta. Soluções que transformam." className="mt-8 max-w-[18ch] text-display-xl text-ink">
           <span
             className={`block transition-all duration-1000 ease-out ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -252,7 +252,7 @@ export function Hero() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent">
+          <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent-hover">
             Vagas limitadas · 2026
           </span>
           <span className="text-ink-muted">

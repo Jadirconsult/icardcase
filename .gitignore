@@ -1,0 +1,31 @@
+/node_modules
+/.pnp
+.pnp.js
+/coverage
+/.next/
+/out/
+next-env.d.ts
+/build
+.DS_Store
+*.pem
+.idea
+.vscode
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env*.local
+.env
+.vercel
+*.tsbuildinfo
+
+# Claude Code — skills e config locais não vão pro repo público
+/.claude
+
+# Documentos estratégicos internos — NÃO publicar
+CONTEXTO-ICARDCASE.md
+*.private.md
+/docs/internal/
+
+# Protótipos iniciais (referência local apenas)
+*_exemplo.txt
+*exemplo.txt

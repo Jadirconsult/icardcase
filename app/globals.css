@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01', 'ss03';
+  }
+  *:focus-visible {
+    outline: 2px solid rgba(37, 99, 235, 0.55);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  ::selection {
+    @apply bg-accent text-white;
+  }
+
+  /* Headings — Inter 600 com tracking negativo agressivo (Linear-style) */
+  h1, h2, h3, h4 {
+    font-family: var(--font-inter), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* ─── Layout containers ──────────────────────────────────────────── */
+  .container-content {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8 lg:px-12;
+  }
+
+  .section-y {
+    @apply py-24 sm:py-32 lg:py-40;
+  }
+
+  /* ─── Eyebrow (Linear-style: mono uppercase + tracking positivo) ── */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-ink-subtle;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background-color: rgba(148, 163, 184, 0.4);
+    display: inline-block;
+  }
+
+  .section-kicker {
+    @apply inline-flex items-center gap-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-accent;
+  }
+
+  /* ─── Buttons (rounded-md 8px, sem pill, Linear-spec) ────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-accent-hover focus-visible:outline-none;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  }
+  .btn-primary:hover {
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 4px 24px -8px rgba(37, 99, 235, 0.5);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-hairline bg-surface-1 px-4 py-2.5 text-sm font-medium text-ink transition-all duration-200 hover:border-hairline-strong hover:bg-surface-2;
+  }
+
+  .btn-ghost-dark {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-hairline bg-transparent px-4 py-2.5 text-sm font-medium text-ink transition-all duration-200 hover:border-hairline-strong hover:bg-surface-1;
+  }
+
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:border-white/40 hover:bg-white/5;
+  }
+
+  /* ─── Hairline divider ───────────────────────────────────────────── */
+  .hairline {
+    @apply border-t border-hairline;
+  }
+
+  /* ─── Surface card Linear-spec (1px border, no shadow) ──────────── */
+  .surface-card {
+    @apply rounded-xl border border-hairline bg-surface-1 transition-all duration-300;
+  }
+  .surface-card:hover {
+    @apply border-hairline-strong bg-surface-2;
+  }
+
+  /* ─── Texture: faint pixel grain pra dar 'rendered' feel ─────────── */
+  .grain-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  }
+
+  /* ─── Top-edge highlight (Linear's 'pixel rendered' feel) ───────── */
+  .edge-highlight {
+    position: relative;
+  }
+  .edge-highlight::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ─── Animated underline em links ────────────────────────────────── */
+  .link-underline {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* ─── Prose para artigos ──────────────────────────────────────── */
+  .prose-icardcase {
+    @apply max-w-none text-ink leading-relaxed;
+  }
+  .prose-icardcase h2 {
+    @apply text-3xl md:text-4xl font-semibold text-ink mt-16 mb-5;
+    letter-spacing: -0.025em;
+  }
+  .prose-icardcase h3 {
+    @apply text-xl font-semibold text-ink mt-10 mb-3;
+    letter-spacing: -0.015em;
+  }
+  .prose-icardcase p {
+    @apply text-base md:text-lg text-ink-muted leading-relaxed mb-5;
+  }
+  .prose-icardcase a {
+    @apply text-accent hover:text-accent-hover transition-colors;
+  }
+  .prose-icardcase ul {
+    @apply list-disc list-outside space-y-2 mb-5 pl-5 text-ink-muted;
+  }
+  .prose-icardcase ol {
+    @apply list-decimal list-outside space-y-2 mb-5 pl-5 text-ink-muted;
+  }
+  .prose-icardcase strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-icardcase blockquote {
+    @apply border-l-2 border-accent pl-5 italic text-ink-subtle my-8;
+  }
+  .prose-icardcase code {
+    @apply bg-surface-2 text-accent px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+}
+
+/* ─── Conic gradient sutil pro hero background ────────────────────── */
+@layer utilities {
+  .bg-mesh {
+    background-image:
+      radial-gradient(at 20% 30%, rgba(37, 99, 235, 0.10) 0px, transparent 50%),
+      radial-gradient(at 80% 20%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+      radial-gradient(at 60% 80%, rgba(37, 99, 235, 0.08) 0px, transparent 50%);
+  }
+  .text-display-xl { font-size: clamp(2.5rem, 6.5vw, 5rem); line-height: 1.05; letter-spacing: -0.04em; font-weight: 600; }
+  .text-display-lg { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.10; letter-spacing: -0.032em; font-weight: 600; }
+  .text-display-md { font-size: clamp(1.75rem, 3.2vw, 2.5rem); line-height: 1.15; letter-spacing: -0.025em; font-weight: 600; }
+  .text-headline { font-size: clamp(1.5rem, 2.2vw, 1.75rem); line-height: 1.20; letter-spacing: -0.022em; font-weight: 600; }
+}

@@ -22,6 +22,19 @@
     @apply bg-accent text-white;
   }
 
+  /* Respeita usuários com prefers-reduced-motion (WCAG 2.3.3):
+     neutraliza animações infinitas, transições e scroll suave. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   /* Headings — Inter 600 com tracking negativo agressivo (Linear-style) */
   h1, h2, h3, h4 {
     font-family: var(--font-inter), system-ui, sans-serif;

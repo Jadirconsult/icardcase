@@ -29,3 +29,10 @@ CONTEXTO-ICARDCASE.md
 # Protótipos iniciais (referência local apenas)
 *_exemplo.txt
 *exemplo.txt
+
+# Documentos operacionais gerados (DNS, deploy, runbooks) — uso interno
+/docs/DNS-APONTAMENTO-*.pdf
+/docs/DNS-APONTAMENTO-*.html
+/docs/RUNBOOK-*.pdf
+
+.vercel

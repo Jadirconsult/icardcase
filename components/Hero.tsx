@@ -15,6 +15,8 @@ export function Hero() {
   useEffect(() => {
     const node = heroRef.current
     if (!node) return
+    // Respeita prefers-reduced-motion: sem parallax pra quem pediu menos movimento.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const handleMove = (e: MouseEvent) => {
       const rect = node.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2

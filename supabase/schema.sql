@@ -99,16 +99,22 @@ create trigger trg_leads_updated_at
   before update on public.leads
   for each row execute function public.set_updated_at();
 
+-- LIMITAÇÃO CONHECIDA: audit_log.changed_by sempre fica NULL nas escritas
+-- vindas das API routes (que usam service_role e bypassam auth.uid()).
+-- Para rastrear o agente humano em mudanças manuais futuras (dashboard admin),
+-- criar uma role autenticada separada para esses fluxos. Enquanto isso, o
+-- IP e user_agent ficam embutidos no new_data via to_jsonb(new).
 create or replace function public.log_lead_changes()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.audit_log (table_name, record_id, action, old_data, new_data)
+  insert into public.audit_log (table_name, record_id, action, old_data, new_data, changed_by)
   values (
     'leads',
     coalesce(new.id, old.id),
     tg_op,
     case when tg_op in ('UPDATE','DELETE') then to_jsonb(old) else null end,
-    case when tg_op in ('INSERT','UPDATE') then to_jsonb(new) else null end
+    case when tg_op in ('INSERT','UPDATE') then to_jsonb(new) else null end,
+    auth.uid()  -- NULL quando vem via service_role; preenchido em sessões autenticadas
   );
   return coalesce(new, old);
 end; $$;

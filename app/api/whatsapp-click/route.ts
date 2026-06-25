@@ -3,15 +3,47 @@
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { whatsappClickSchema } from '@/lib/validation'
-import { whatsappClickRateLimit, checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { whatsappClickRateLimit, checkRateLimit, getClientIp, maskIp } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
+// Origens permitidas — só aceita POST vindo dos próprios domínios.
+const ALLOWED_ORIGINS = new Set([
+  'https://icardcase.com.br',
+  'https://www.icardcase.com.br',
+  'https://icardcase.vercel.app',
+])
+
+function isAllowedOrigin(request: NextRequest): boolean {
+  // Em dev (localhost), aceitar sempre.
+  if (process.env.NODE_ENV !== 'production') return true
+  const origin = request.headers.get('origin')
+  const referer = request.headers.get('referer')
+  if (origin && ALLOWED_ORIGINS.has(origin)) return true
+  if (referer) {
+    try {
+      const url = new URL(referer)
+      const base = `${url.protocol}//${url.host}`
+      if (ALLOWED_ORIGINS.has(base)) return true
+    } catch {
+      // referer mal formado — ignora
+    }
+  }
+  return false
+}
+
 export async function POST(request: NextRequest) {
+  // 1. ORIGIN — filtra ruído trivial de botnet com Origin/Referer alheios
+  if (!isAllowedOrigin(request)) {
+    return NextResponse.json({ ok: false }, { status: 403 })
+  }
+
+  // 2. RATE LIMIT
   const ip = getClientIp(request)
   const rateCheck = await checkRateLimit(whatsappClickRateLimit, ip)
   if (!rateCheck.allowed) return NextResponse.json({ ok: false }, { status: 429 })
 
+  // 3. PARSE + VALIDATE
   let body: unknown
   try {
     body = await request.json()
@@ -22,7 +54,7 @@ export async function POST(request: NextRequest) {
   const parsed = whatsappClickSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ ok: false }, { status: 400 })
 
-  // Em dev sem Supabase, no-op silencioso
+  // 4. INSERT (silencioso se Supabase não estiver configurado em dev)
   try {
     const { getSupabaseAdmin } = await import('@/lib/supabase')
     const supabase = getSupabaseAdmin()
@@ -37,10 +69,9 @@ export async function POST(request: NextRequest) {
         referrer: request.headers.get('referer')?.substring(0, 500) ?? null,
       })
       .then(({ error }) => {
-        if (error) console.error('[WA Click]', error)
+        if (error) console.error('[WA Click]', { ip: maskIp(ip), code: error.code ?? 'unknown' })
       })
-  } catch (err) {
-    // Sem Supabase configurado — telemetria desligada mas resposta 200
+  } catch {
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[WA Click] Telemetria desligada (Supabase não configurado)')
     }

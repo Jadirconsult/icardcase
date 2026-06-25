@@ -34,5 +34,7 @@ CONTEXTO-ICARDCASE.md
 /docs/DNS-APONTAMENTO-*.pdf
 /docs/DNS-APONTAMENTO-*.html
 /docs/RUNBOOK-*.pdf
+/docs/SEGURANCA-OPERACIONAL.md
+/docs/INCIDENTS-*.md
 
 .vercel

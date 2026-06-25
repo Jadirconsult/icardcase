@@ -12,7 +12,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { leadSchema, sanitizeText } from '@/lib/validation'
-import { leadFormRateLimit, checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { leadFormRateLimit, checkRateLimit, getClientIp, maskIp } from '@/lib/rate-limit'
 import { notifyLeadViaWhatsApp, notifyLeadViaN8N } from '@/lib/notify'
 
 export const runtime = 'nodejs'
@@ -45,10 +45,14 @@ export async function POST(request: NextRequest) {
 
   const data = parsed.data
 
-  // 3. HONEYPOT
+  // 3. HONEYPOT — não devolver string fixa 'honeypot' (entrega detecção pro bot).
+  // Retornar um UUID realista pra simular insert OK, mas sem gravar nada.
   if (data.website && data.website.length > 0) {
-    console.warn('[Lead] Honeypot:', { ip, website: data.website })
-    return NextResponse.json({ ok: true, id: 'honeypot' }, { status: 200 })
+    console.warn('[Lead] Honeypot:', { ip: maskIp(ip), website: data.website.substring(0, 50) })
+    return NextResponse.json(
+      { ok: true, id: crypto.randomUUID(), message: 'Recebemos seu contato.' },
+      { status: 200 },
+    )
   }
 
   // 4. SANITIZE
@@ -86,7 +90,8 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error || !inserted) {
-    console.error('[Lead] Erro insert:', error)
+    // Log com IP mascarado e código do erro Postgres (sem expor schema).
+    console.error('[Lead] Erro insert:', { ip: maskIp(ip), code: error?.code ?? 'unknown' })
     return NextResponse.json(
       { ok: false, error: 'Erro ao registrar. Tente o WhatsApp direto.' },
       { status: 500 }

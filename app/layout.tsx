@@ -37,11 +37,21 @@ export const metadata: Metadata = {
     'segurança e LGPD',
     'desenvolvimento web Rio de Janeiro',
   ],
+  applicationName: 'Icardcase',
   authors: [{ name: 'Jadir Luiz de Oliveira Junior', url: siteUrl }],
   creator: 'Icardcase',
   publisher: 'Icardcase',
+  referrer: 'strict-origin-when-cross-origin',
   formatDetection: { email: false, address: false, telephone: false },
   alternates: { canonical: siteUrl },
+  appleWebApp: {
+    capable: true,
+    title: 'Icardcase',
+    statusBarStyle: 'black-translucent',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
@@ -79,6 +89,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#081F4D',
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -88,6 +99,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
+        {/* Resource hints — abre conexão antes do parser pedir (perf) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

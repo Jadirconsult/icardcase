@@ -47,17 +47,22 @@ export function generateStaticParams() {
   return Object.keys(CASES).map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const c = CASES[params.slug]
+// Next 15+/16: params virou Promise — sempre await antes de usar
+type CasePageParams = Promise<{ slug: string }>
+
+export async function generateMetadata({ params }: { params: CasePageParams }): Promise<Metadata> {
+  const { slug } = await params
+  const c = CASES[slug]
   if (!c) return { title: 'Não encontrado' }
   return { title: c.title, description: c.subtitle }
 }
 
-export default function CasePage({ params }: { params: { slug: string } }) {
-  const c = CASES[params.slug]
+export default async function CasePage({ params }: { params: CasePageParams }) {
+  const { slug } = await params
+  const c = CASES[slug]
   if (!c) notFound()
 
-  const url = `${SITE.url}/cases/${params.slug}`
+  const url = `${SITE.url}/cases/${slug}`
 
   // Schema.org CreativeWork — descreve o case como obra de engenharia
   const caseSchema = {

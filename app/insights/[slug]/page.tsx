@@ -165,12 +165,14 @@ Se você quer iniciar essa conversa, vamos marcar.
   },
 }
 
+// Next 15+/16: params virou Promise — sempre await antes de usar
 interface PageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const post = POSTS[params.slug]
+  const { slug } = await params
+  const post = POSTS[slug]
   if (!post) return { title: 'Não encontrado' }
   return {
     title: post.title,
@@ -188,11 +190,12 @@ export function generateStaticParams() {
   return Object.keys(POSTS).map((slug) => ({ slug }))
 }
 
-export default function PostPage({ params }: PageProps) {
-  const post = POSTS[params.slug]
+export default async function PostPage({ params }: PageProps) {
+  const { slug } = await params
+  const post = POSTS[slug]
   if (!post) notFound()
 
-  const url = `${SITE.url}/insights/${params.slug}`
+  const url = `${SITE.url}/insights/${slug}`
 
   // Schema.org Article — rich snippet no Google (autor, data, headline)
   const articleSchema = {

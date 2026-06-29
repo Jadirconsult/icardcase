@@ -37,4 +37,9 @@ CONTEXTO-ICARDCASE.md
 /docs/SEGURANCA-OPERACIONAL.md
 /docs/INCIDENTS-*.md
 
+# Artefatos de auditoria local (Lighthouse, PageSpeed) — não publicar
+lighthouse-*.json
+lighthouse-*.html
+psi-*.json
+
 .vercel

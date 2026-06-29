@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
+import { SITE } from '@/lib/constants'
 
 const CASES: Record<string, { segment: string; title: string; subtitle: string; problem: string; solution: string; results: string[]; tech: string[] }> = {
   'syspershy': {
@@ -56,8 +57,47 @@ export default function CasePage({ params }: { params: { slug: string } }) {
   const c = CASES[params.slug]
   if (!c) notFound()
 
+  const url = `${SITE.url}/cases/${params.slug}`
+
+  // Schema.org CreativeWork — descreve o case como obra de engenharia
+  const caseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: c.title,
+    headline: `${c.title} — ${c.subtitle}`,
+    description: c.subtitle,
+    abstract: c.problem,
+    keywords: c.tech.join(', '),
+    inLanguage: 'pt-BR',
+    creator: {
+      '@type': 'Organization',
+      name: 'Icardcase',
+      url: SITE.url,
+    },
+    about: c.segment,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  }
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Cases', item: `${SITE.url}/cases` },
+      { '@type': 'ListItem', position: 3, name: c.title, item: url },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(caseSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <article className="section-y bg-white">
         <div className="container-content max-w-prose-wide">
           <Link href="/cases" className="text-sm font-semibold text-brand-blue hover:underline">

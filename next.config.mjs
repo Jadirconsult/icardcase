@@ -53,6 +53,33 @@ const apiCorsHeaders = [
   { key: 'Vary', value: 'Origin' },
 ]
 
+/**
+ * Cache estratégico para conteúdo público estático/SSG:
+ * - s-maxage=3600 → CDN serve do cache por 1h sem revalidar
+ * - stale-while-revalidate=86400 → mais 24h servindo stale enquanto revalida em background
+ * - max-age=0 no browser → usuário sempre pega resposta fresca do CDN (não cacheia local)
+ * Resultado: TTFB cai pra ~50-150ms (CDN edge), conteúdo atualiza em ~1h em ondas.
+ */
+const publicCacheHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+  },
+]
+
+// API routes nunca cacheiam — sempre fresh
+const apiNoCacheHeaders = [
+  { key: 'Cache-Control', value: 'no-store, max-age=0' },
+]
+
+// Assets versionados (favicon, og, manifest) — cache longo
+const staticAssetCacheHeaders = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=86400, s-maxage=604800, immutable',
+  },
+]
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -65,6 +92,12 @@ const nextConfig = {
     return [
       { source: '/:path*', headers: securityHeaders },
       { source: '/api/:path*', headers: apiCorsHeaders },
+      { source: '/api/:path*', headers: apiNoCacheHeaders },
+      // Páginas públicas (home, sobre, cases, insights, contato) — cache CDN agressivo
+      { source: '/((?!api|_next).*)', headers: publicCacheHeaders },
+      // Assets estáticos (favicon, ícones, OG) — cache muito longo
+      { source: '/(favicon|icon|apple-touch|android-chrome|og-default|logo-mark).:ext*', headers: staticAssetCacheHeaders },
+      { source: '/site.webmanifest', headers: staticAssetCacheHeaders },
     ]
   },
   async redirects() {

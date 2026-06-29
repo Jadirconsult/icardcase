@@ -17,14 +17,26 @@ export function Hero() {
     if (!node) return
     // Respeita prefers-reduced-motion: sem parallax pra quem pediu menos movimento.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    // rAF-throttle: agenda setState em até 1 frame (~16ms a 60fps), evita
+    // re-render a cada mousemove (que dispara 100-1000x/seg em telas 4K).
+    let rafId = 0
+    let latest = { x: 0, y: 0 }
     const handleMove = (e: MouseEvent) => {
       const rect = node.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-      setParallax({ x, y })
+      latest.x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+      latest.y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        setParallax({ x: latest.x, y: latest.y })
+        rafId = 0
+      })
     }
-    node.addEventListener('mousemove', handleMove)
-    return () => node.removeEventListener('mousemove', handleMove)
+    node.addEventListener('mousemove', handleMove, { passive: true })
+    return () => {
+      node.removeEventListener('mousemove', handleMove)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   return (

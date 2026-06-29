@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
+import { SITE } from '@/lib/constants'
 
 // Posts hardcoded por enquanto - quando voce quiser MDX, a gente migra.
 const POSTS: Record<string, { title: string; date: string; readTime: string; category: string; description: string; content: string }> = {
@@ -191,8 +192,54 @@ export default function PostPage({ params }: PageProps) {
   const post = POSTS[params.slug]
   if (!post) notFound()
 
+  const url = `${SITE.url}/insights/${params.slug}`
+
+  // Schema.org Article — rich snippet no Google (autor, data, headline)
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      '@type': 'Person',
+      name: 'Jadir Luiz de Oliveira Junior',
+      jobTitle: 'CEO & Founder',
+      worksFor: { '@type': 'Organization', name: 'Icardcase', url: SITE.url },
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Icardcase',
+      url: SITE.url,
+      logo: { '@type': 'ImageObject', url: `${SITE.url}/icon.svg` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    articleSection: post.category,
+    inLanguage: 'pt-BR',
+  }
+
+  // Schema.org BreadcrumbList — hierarquia navegável pro Google
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Insights', item: `${SITE.url}/insights` },
+      { '@type': 'ListItem', position: 3, name: post.title, item: url },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <article className="section-y bg-white">
         <div className="container-content max-w-prose-wide">
           <Link href="/insights" className="text-sm font-semibold text-brand-blue hover:underline inline-flex items-center gap-1">

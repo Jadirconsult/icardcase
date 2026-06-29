@@ -76,7 +76,7 @@ export function Differentials() {
             {points.map((p, i) => (
               <li
                 key={p.title}
-                className={`group relative transition-all duration-700 ease-out ${
+                className={`group relative transition-all duration-500 ease-out ${
                   visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`}
                 style={{ transitionDelay: `${i * 120}ms` }}

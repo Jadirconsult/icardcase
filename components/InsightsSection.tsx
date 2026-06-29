@@ -83,7 +83,7 @@ export function InsightsSection() {
           {posts.map((post, i) => (
             <li
               key={post.slug}
-              className={`transition-all duration-700 ease-out ${
+              className={`transition-all duration-500 ease-out ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{ transitionDelay: `${i * 100}ms` }}

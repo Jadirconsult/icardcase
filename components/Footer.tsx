@@ -118,8 +118,11 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Tagline gigante editorial — Linear-style */}
-        <div className="pt-10 border-t border-hairline">
+        {/* Tagline gigante editorial — Linear-style.
+            Marcada como decorativa: o efeito 'fantasma' (opacity 40%) tem contraste
+            visualmente baixo de propósito. A tagline real já é indexada pelo
+            Schema.org no <head> + aparece no copyright abaixo. */}
+        <div className="pt-10 border-t border-hairline" aria-hidden="true">
           <p className="text-display-md text-ink-subtle/40 select-none">
             Tecnologia que conecta. Soluções que transformam.
           </p>

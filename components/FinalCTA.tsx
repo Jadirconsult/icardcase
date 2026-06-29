@@ -40,7 +40,7 @@ export function FinalCTA() {
           <div className="relative grid gap-12 p-10 sm:p-14 lg:grid-cols-12 lg:gap-16 lg:p-20">
             {/* Coluna esquerda — copy editorial */}
             <div
-              className={`lg:col-span-7 transition-all duration-1000 ease-out ${
+              className={`lg:col-span-7 transition-all duration-500 ease-out ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -74,10 +74,10 @@ export function FinalCTA() {
 
             {/* Coluna direita — meta info técnica em mono */}
             <div
-              className={`lg:col-span-5 lg:border-l lg:border-hairline lg:pl-16 transition-all duration-1000 ease-out ${
+              className={`lg:col-span-5 lg:border-l lg:border-hairline lg:pl-16 transition-all duration-500 ease-out ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
-              style={{ transitionDelay: '180ms' }}
+              style={{ transitionDelay: '90ms' }}
             >
               <p className="section-kicker">Como acontece</p>
               <ul className="mt-6 space-y-5">

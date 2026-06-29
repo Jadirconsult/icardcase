@@ -99,9 +99,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
-        {/* Resource hints — abre conexão antes do parser pedir (perf) */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* next/font faz self-host das fontes — não há preconnect a fazer pro Google.
+            Removido o preconnect que o Lighthouse flagrou como "não utilizado". */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

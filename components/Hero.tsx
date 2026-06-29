@@ -147,26 +147,26 @@ export function Hero() {
         {/* Headline display-xl — entra com stagger, tracking negativo agressivo */}
         <h1 aria-label="Tecnologia que conecta. Soluções que transformam." className="mt-8 max-w-[18ch] text-display-xl text-ink">
           <span
-            className={`block transition-all duration-1000 ease-out ${
+            className={`block transition-all duration-500 ease-out ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
-            style={{ transitionDelay: '120ms' }}
+            style={{ transitionDelay: '60ms' }}
           >
             Tecnologia que
           </span>
           <span
-            className={`block transition-all duration-1000 ease-out ${
+            className={`block transition-all duration-500 ease-out ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
-            style={{ transitionDelay: '240ms' }}
+            style={{ transitionDelay: '120ms' }}
           >
             <span className="bg-gradient-to-r from-ink via-ink to-accent bg-clip-text text-transparent">conecta.</span>
           </span>
           <span
-            className={`block text-ink transition-all duration-1000 ease-out ${
+            className={`block text-ink transition-all duration-500 ease-out ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
-            style={{ transitionDelay: '360ms' }}
+            style={{ transitionDelay: '180ms' }}
           >
             Soluções que transformam.
             <span className="ml-1 inline-block h-[0.8em] w-[3px] translate-y-[2px] bg-accent animate-pulse" aria-hidden="true" />
@@ -175,20 +175,20 @@ export function Hero() {
 
         {/* Subhead */}
         <p
-          className={`mt-8 max-w-[58ch] text-lg leading-[1.55] text-ink-subtle sm:text-xl transition-all duration-1000 ease-out ${
+          className={`mt-8 max-w-[58ch] text-lg leading-[1.55] text-ink-subtle sm:text-xl transition-all duration-500 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
-          style={{ transitionDelay: '480ms' }}
+          style={{ transitionDelay: '240ms' }}
         >
           Soluções web e mobile sob medida para qualquer desafio do seu negócio. Tem um processo travado, um sistema que ainda não existe ou uma ideia que precisa sair do papel? Eu resolvo — da automação a sistemas completos — com infraestrutura confiável, segurança aplicada e atendimento direto comigo, sem terceirizações e sem call center.
         </p>
 
         {/* CTAs Linear-spec */}
         <div
-          className={`mt-10 flex flex-col sm:flex-row gap-3 transition-all duration-1000 ease-out ${
+          className={`mt-10 flex flex-col sm:flex-row gap-3 transition-all duration-500 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
-          style={{ transitionDelay: '600ms' }}
+          style={{ transitionDelay: '300ms' }}
         >
           <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="btn-primary group">
             Conversar sobre seu projeto
@@ -224,10 +224,10 @@ export function Hero() {
 
         {/* Stats bar — Linear-style com hairline + mono labels */}
         <div
-          className={`mt-24 pt-10 border-t border-hairline transition-all duration-1000 ease-out ${
+          className={`mt-24 pt-10 border-t border-hairline transition-all duration-500 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
-          style={{ transitionDelay: '760ms' }}
+          style={{ transitionDelay: '380ms' }}
         >
           <div className="grid grid-cols-2 gap-y-10 gap-x-12 sm:grid-cols-4">
             {[
@@ -238,10 +238,10 @@ export function Hero() {
             ].map((stat, i) => (
               <div
                 key={stat.label}
-                className={`group transition-all duration-700 ease-out ${
+                className={`group transition-all duration-400 ease-out ${
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
                 }`}
-                style={{ transitionDelay: `${900 + i * 100}ms` }}
+                style={{ transitionDelay: `${440 + i * 60}ms` }}
               >
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-display-md text-ink transition-colors duration-300 group-hover:text-accent">

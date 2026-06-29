@@ -100,16 +100,8 @@ const nextConfig = {
       { source: '/site.webmanifest', headers: staticAssetCacheHeaders },
     ]
   },
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.icardcase.com.br' }],
-        destination: 'https://icardcase.com.br/:path*',
-        permanent: true,
-      },
-    ]
-  },
+  // www → apex agora é responsabilidade do painel Vercel (Domains → Redirect to).
+  // Manter o redirect aqui causaria loop com o redirect do Vercel.
 }
 
 export default nextConfig

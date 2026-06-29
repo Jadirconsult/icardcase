@@ -57,6 +57,43 @@ export function LeadForm() {
     }
   }
 
+  // Validação inline por campo (roda no onBlur — não polui enquanto digita)
+  function validateField<K extends keyof FormData>(key: K, value: FormData[K]) {
+    const errors: string[] = []
+    if (key === 'nome') {
+      const v = String(value).trim()
+      if (v.length > 0 && v.length < 2) errors.push('Nome muito curto')
+    }
+    if (key === 'email') {
+      const v = String(value).trim()
+      if (v.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v)) {
+        errors.push('E-mail inválido')
+      }
+    }
+    if (key === 'whatsapp') {
+      const digits = String(value).replace(/\D/g, '')
+      if (digits.length > 0 && (digits.length < 10 || digits.length > 15)) {
+        errors.push('WhatsApp deve ter 10 a 15 dígitos')
+      }
+    }
+    if (key === 'empresa') {
+      const v = String(value).trim()
+      if (v.length > 0 && v.length < 2) errors.push('Empresa muito curta')
+    }
+    if (key === 'mensagem') {
+      const v = String(value).trim()
+      if (v.length > 0 && v.length < 20) {
+        errors.push(`Mensagem precisa ter pelo menos 20 caracteres (${v.length}/20)`)
+      }
+    }
+    setFieldErrors((prev) => {
+      const next = { ...prev }
+      if (errors.length > 0) next[key as string] = errors
+      else delete next[key as string]
+      return next
+    })
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (state === 'submitting') return
@@ -142,13 +179,17 @@ export function LeadForm() {
             required
             minLength={2}
             maxLength={100}
+            autoComplete="name"
             value={data.nome}
             onChange={(e) => update('nome', e.target.value)}
+            onBlur={(e) => validateField('nome', e.target.value)}
             disabled={state === 'submitting'}
-            className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            aria-invalid={!!fieldErrors.nome}
+            aria-describedby={fieldErrors.nome ? 'nome-error' : undefined}
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
           />
           {fieldErrors.nome?.[0] && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.nome[0]}</p>
+            <p id="nome-error" className="mt-1 text-xs text-red-600">{fieldErrors.nome[0]}</p>
           )}
         </div>
 
@@ -162,13 +203,17 @@ export function LeadForm() {
             required
             minLength={2}
             maxLength={200}
+            autoComplete="organization"
             value={data.empresa}
             onChange={(e) => update('empresa', e.target.value)}
+            onBlur={(e) => validateField('empresa', e.target.value)}
             disabled={state === 'submitting'}
-            className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            aria-invalid={!!fieldErrors.empresa}
+            aria-describedby={fieldErrors.empresa ? 'empresa-error' : undefined}
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
           />
           {fieldErrors.empresa?.[0] && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.empresa[0]}</p>
+            <p id="empresa-error" className="mt-1 text-xs text-red-600">{fieldErrors.empresa[0]}</p>
           )}
         </div>
       </div>
@@ -183,13 +228,18 @@ export function LeadForm() {
             id="email"
             required
             maxLength={200}
+            autoComplete="email"
+            inputMode="email"
             value={data.email}
             onChange={(e) => update('email', e.target.value)}
+            onBlur={(e) => validateField('email', e.target.value)}
             disabled={state === 'submitting'}
-            className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            aria-invalid={!!fieldErrors.email}
+            aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
           />
           {fieldErrors.email?.[0] && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.email[0]}</p>
+            <p id="email-error" className="mt-1 text-xs text-red-600">{fieldErrors.email[0]}</p>
           )}
         </div>
 
@@ -202,13 +252,18 @@ export function LeadForm() {
             id="whatsapp"
             required
             placeholder="(21) 99999-9999"
+            autoComplete="tel"
+            inputMode="tel"
             value={data.whatsapp}
             onChange={(e) => update('whatsapp', e.target.value)}
+            onBlur={(e) => validateField('whatsapp', e.target.value)}
             disabled={state === 'submitting'}
-            className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            aria-invalid={!!fieldErrors.whatsapp}
+            aria-describedby={fieldErrors.whatsapp ? 'whatsapp-error' : undefined}
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
           />
           {fieldErrors.whatsapp?.[0] && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.whatsapp[0]}</p>
+            <p id="whatsapp-error" className="mt-1 text-xs text-red-600">{fieldErrors.whatsapp[0]}</p>
           )}
         </div>
       </div>
@@ -223,7 +278,7 @@ export function LeadForm() {
           value={data.segmento}
           onChange={(e) => update('segmento', e.target.value as FormData['segmento'])}
           disabled={state === 'submitting'}
-          className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60 bg-white"
+          className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60 bg-white"
         >
           <option value="">Selecione…</option>
           <option value="contabilidade">Escritório contábil</option>
@@ -246,15 +301,18 @@ export function LeadForm() {
           rows={5}
           value={data.mensagem}
           onChange={(e) => update('mensagem', e.target.value)}
+          onBlur={(e) => validateField('mensagem', e.target.value)}
           disabled={state === 'submitting'}
           placeholder="Conta um pouco sobre o que você precisa: sistema novo? migração de legado? suporte recorrente? infraestrutura?"
+          aria-invalid={!!fieldErrors.mensagem}
+          aria-describedby={fieldErrors.mensagem ? 'mensagem-error mensagem-counter' : 'mensagem-counter'}
           className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60 resize-y"
         />
-        <p className="mt-1 text-xs text-muted">
+        <p id="mensagem-counter" className="mt-1 text-xs text-muted">
           {data.mensagem.length}/2000 caracteres
         </p>
         {fieldErrors.mensagem?.[0] && (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.mensagem[0]}</p>
+          <p id="mensagem-error" className="mt-1 text-xs text-red-600">{fieldErrors.mensagem[0]}</p>
         )}
       </div>
 

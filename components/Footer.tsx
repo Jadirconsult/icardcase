@@ -26,11 +26,11 @@ export function Footer() {
               Navegação
             </h3>
             <ul className="space-y-3 text-sm">
-              <li><Link href="/" className="text-ink-muted hover:text-ink transition-colors">Início</Link></li>
-              <li><Link href="/cases" className="text-ink-muted hover:text-ink transition-colors">Cases</Link></li>
-              <li><Link href="/insights" className="text-ink-muted hover:text-ink transition-colors">Insights</Link></li>
-              <li><Link href="/sobre" className="text-ink-muted hover:text-ink transition-colors">Sobre</Link></li>
-              <li><Link href="/contato" className="text-ink-muted hover:text-ink transition-colors">Contato</Link></li>
+              <li><Link href="/" className="footer-link">Início</Link></li>
+              <li><Link href="/cases" className="footer-link">Cases</Link></li>
+              <li><Link href="/insights" className="footer-link">Insights</Link></li>
+              <li><Link href="/sobre" className="footer-link">Sobre</Link></li>
+              <li><Link href="/contato" className="footer-link">Contato</Link></li>
             </ul>
           </div>
 
@@ -88,11 +88,28 @@ export function Footer() {
             <h3 className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary mb-5">
               Status
             </h3>
-            <div className="flex items-center gap-2 text-sm text-ink-muted">
-              <span className="relative flex h-2 w-2">
+            <div
+              className="flex items-center gap-2 text-sm text-ink-muted"
+              role="status"
+              aria-label="Sistemas operacionais. Tudo funcionando normalmente."
+            >
+              <span className="relative flex h-2 w-2" aria-hidden="true">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
+              {/* Ícone redundante pra não depender só de cor (a11y / daltonismo) */}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className="text-emerald-400"
+                aria-hidden="true"
+              >
+                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
               Operacional
             </div>
             <p className="mt-3 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">

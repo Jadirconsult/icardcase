@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
@@ -158,6 +160,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WhatsAppButton origem="float_button" variant="float">
           <span className="sr-only">WhatsApp</span>
         </WhatsAppButton>
+        {/* Vercel Analytics — page views + eventos */}
+        <Analytics />
+        {/* Vercel Speed Insights — Core Web Vitals reais (RUM) */}
+        <SpeedInsights />
       </body>
     </html>
   )

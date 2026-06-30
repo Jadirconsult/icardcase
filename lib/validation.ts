@@ -1,9 +1,13 @@
 /**
  * Validação de inputs — Icardcase
- * Zod (estrutura) + DOMPurify (HTML) + regex (sanitização)
+ * Zod (estrutura) + regex (sanitização inline)
+ *
+ * Sem isomorphic-dompurify: a lib puxa jsdom que virou ESM-only e quebrava o
+ * build em runtime do Vercel (ERR_REQUIRE_ESM). Como o conteúdo dos campos é
+ * gravado como texto puro no Postgres (nunca renderizado como HTML em
+ * navegador), basta strip de tags + neutralização de < > residuais.
  */
 import { z } from 'zod'
-import DOMPurify from 'isomorphic-dompurify'
 
 export const leadSchema = z.object({
   nome: z.string().trim().min(2, 'Nome muito curto').max(100)
@@ -28,7 +32,11 @@ export const leadSchema = z.object({
 export type LeadInput = z.infer<typeof leadSchema>
 
 export function sanitizeText(input: string): string {
-  return DOMPurify.sanitize(input, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
+  // Zod já valida estrutura (tamanho, formato). Aqui só neutralizamos HTML.
+  return input
+    .replace(/<[^>]*>/g, '')   // remove tags completas (<script>, <img ...>, etc.)
+    .replace(/[<>]/g, '')      // remove <> residuais (defesa contra tags malformadas)
+    .trim()
 }
 
 export const whatsappClickSchema = z.object({

@@ -9,6 +9,10 @@ const routes = [
   { url: '/contato', priority: 0.7, changeFrequency: 'monthly' as const },
   // Páginas de serviço — SEO orgânico nacional
   { url: '/desenvolvimento-de-sistemas', priority: 0.9, changeFrequency: 'monthly' as const },
+  { url: '/desenvolvimento-mobile', priority: 0.9, changeFrequency: 'monthly' as const },
+  { url: '/infraestrutura-de-ti', priority: 0.9, changeFrequency: 'monthly' as const },
+  { url: '/seguranca-lgpd', priority: 0.9, changeFrequency: 'monthly' as const },
+  { url: '/consultoria-ti', priority: 0.9, changeFrequency: 'monthly' as const },
   { url: '/politica-de-privacidade', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/termos-de-uso', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/lgpd', priority: 0.3, changeFrequency: 'yearly' as const },

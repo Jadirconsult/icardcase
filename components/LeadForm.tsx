@@ -316,7 +316,7 @@ export function LeadForm() {
         )}
       </div>
 
-      <div className="flex items-start gap-3 rounded-md border border-hairline bg-surface-1/60 p-4">
+      <div className="flex items-start gap-3 rounded-md border border-hairline bg-surface-1 p-4">
         <input
           type="checkbox"
           id="consentimento"
@@ -324,9 +324,9 @@ export function LeadForm() {
           checked={data.consentimentoLgpd}
           onChange={(e) => update('consentimentoLgpd', e.target.checked)}
           disabled={state === 'submitting'}
-          className="mt-0.5 h-4 w-4 rounded border-hairline-strong bg-surface-2 text-accent focus:ring-2 focus:ring-accent/30"
+          className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-hairline-strong bg-surface-2 text-accent accent-accent focus:ring-2 focus:ring-accent/30"
         />
-        <label htmlFor="consentimento" className="text-sm text-ink-muted leading-relaxed">
+        <label htmlFor="consentimento" className="text-sm text-ink leading-relaxed">
           Concordo com a{' '}
           <a href="/politica-privacidade" target="_blank" className="text-accent hover:text-accent-hover hover:underline font-medium">
             Política de Privacidade

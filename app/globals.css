@@ -41,6 +41,19 @@
     font-weight: 600;
     letter-spacing: -0.02em;
   }
+
+  /* Dropdown <option> nativas: forçar dark pra combinar com o site.
+     <select> aceita Tailwind, mas <option> é renderizada pelo SO/browser e
+     ignora estilo do pai — daí o painel branco com texto cinza no dark. */
+  select option {
+    background-color: #081F4D;
+    color: #F8FAFC;
+  }
+  select option:checked,
+  select option:hover {
+    background-color: #163972;
+    color: #F8FAFC;
+  }
 }
 
 @layer components {

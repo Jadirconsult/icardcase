@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { COMPANY, buildWhatsAppUrl } from '@/lib/constants'
+import { LeadForm } from '@/components/LeadForm'
 
 export const metadata: Metadata = {
   title: 'Contato — vamos conversar sobre seu projeto',
@@ -10,29 +12,62 @@ export const metadata: Metadata = {
 export default function ContatoPage() {
   return (
     <section className="section-y bg-white">
-      <div className="container-content max-w-prose-wide">
-        <p className="section-kicker">CONTATO</p>
-        <h1 className="mt-2 text-h1 font-semibold text-brand-navy">Vamos conversar.</h1>
-        <p className="mt-4 text-base text-brand-gray">
-          A forma mais rápida de falar com a gente é direto pelo WhatsApp. Atendimento de segunda a sexta, 9h às 18h.
-        </p>
-
-        <div className="mt-10 space-y-4">
-          <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="btn-primary text-base px-6 py-4">
-            Conversar no WhatsApp ({COMPANY.contact.phone})
-          </a>
-          <p className="text-sm text-brand-gray">
-            Prefere e-mail? <a href={`mailto:${COMPANY.contact.email}`} className="text-brand-blue hover:underline">{COMPANY.contact.email}</a>
+      <div className="container-content">
+        <div className="max-w-prose-wide">
+          <p className="section-kicker">CONTATO</p>
+          <h1 className="mt-2 text-h1 font-semibold text-brand-navy">Vamos conversar.</h1>
+          <p className="mt-4 text-base text-brand-gray">
+            Conte sobre seu projeto pelo formulário abaixo — respondemos em até 4 horas úteis.
+            Se for urgente, fale direto no WhatsApp.
           </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-brand-navy/10">
-          <h2 className="text-h3 font-semibold text-brand-navy">Onde estamos</h2>
-          <address className="mt-3 not-italic text-base text-brand-gray">
-            {COMPANY.address.street}<br />
-            {COMPANY.address.neighborhood}, {COMPANY.address.city} / {COMPANY.address.state}<br />
-            Brasil
-          </address>
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12">
+          <div>
+            <h2 className="text-h3 font-semibold text-brand-navy mb-6">Conte sobre seu projeto</h2>
+            <Suspense fallback={<div className="h-96 animate-pulse bg-surface-alt rounded-lg" aria-label="Carregando formulário" />}>
+              <LeadForm />
+            </Suspense>
+          </div>
+
+          <aside className="space-y-8">
+            <div className="bg-surface-alt rounded-lg p-6 border border-brand-navy/10">
+              <h3 className="text-sm font-semibold text-brand-navy uppercase tracking-wide">
+                Prefere conversa direta?
+              </h3>
+              <p className="mt-2 text-sm text-brand-gray leading-relaxed">
+                Atendimento de segunda a sexta, 9h às 18h.
+              </p>
+              <a
+                href={buildWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 btn-primary text-sm w-full inline-flex items-center justify-center"
+              >
+                WhatsApp ({COMPANY.contact.phone})
+              </a>
+              <p className="mt-4 text-sm text-brand-gray">
+                Ou e-mail:{' '}
+                <a
+                  href={`mailto:${COMPANY.contact.email}`}
+                  className="text-brand-blue hover:underline break-all"
+                >
+                  {COMPANY.contact.email}
+                </a>
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-brand-navy uppercase tracking-wide">
+                Onde estamos
+              </h3>
+              <address className="mt-3 not-italic text-sm text-brand-gray leading-relaxed">
+                {COMPANY.address.street}<br />
+                {COMPANY.address.neighborhood}, {COMPANY.address.city} / {COMPANY.address.state}<br />
+                Brasil
+              </address>
+            </div>
+          </aside>
         </div>
       </div>
     </section>

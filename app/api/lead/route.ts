@@ -5,15 +5,15 @@
  * 1. Rate limiting (3/hora por IP)
  * 2. Honeypot anti-bot
  * 3. Validação Zod
- * 4. Sanitização DOMPurify
+ * 4. Sanitização (regex inline em lib/validation)
  * 5. Audit log automático (trigger Postgres)
- * 6. Notificação WhatsApp via Evolution
+ * 6. Notificação por e-mail (SMTP) — falha silenciosa
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { leadSchema, sanitizeText } from '@/lib/validation'
 import { leadFormRateLimit, checkRateLimit, getClientIp, maskIp } from '@/lib/rate-limit'
-import { notifyLeadViaWhatsApp, notifyLeadViaN8N } from '@/lib/notify'
+import { notifyLeadViaEmail } from '@/lib/notify'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -98,16 +98,20 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // 6. NOTIFICAÇÕES (async)
-  const notif = {
-    nome: sanitized.nome, empresa: sanitized.empresa, segmento: sanitized.segmento,
-    whatsapp: sanitized.whatsapp, email: sanitized.email, mensagem: sanitized.mensagem,
+  // 6. NOTIFICAÇÃO POR E-MAIL (async, falha silenciosa)
+  notifyLeadViaEmail({
+    nome: sanitized.nome,
+    empresa: sanitized.empresa,
+    segmento: sanitized.segmento,
+    whatsapp: sanitized.whatsapp,
+    email: sanitized.email,
+    mensagem: sanitized.mensagem,
     origem: sanitized.origem || undefined,
-  }
-  Promise.allSettled([
-    notifyLeadViaWhatsApp(notif),
-    notifyLeadViaN8N(notif),
-  ]).catch(err => console.error('[Lead] Notif:', err))
+    utm_source: sanitized.utm_source || undefined,
+    utm_medium: sanitized.utm_medium || undefined,
+    utm_campaign: sanitized.utm_campaign || undefined,
+    leadId: inserted.id,
+  }).catch(err => console.error('[Lead] Notif email:', err))
 
   return NextResponse.json(
     { ok: true, id: inserted.id, message: 'Recebemos seu contato. Retornaremos via WhatsApp em até 4 horas úteis.' },

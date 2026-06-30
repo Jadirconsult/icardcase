@@ -20,6 +20,8 @@ const routes = [
 
 const blogPosts = [
   'reforma-tributaria-2026',
+  'migrar-visual-foxpro-web',
+  'whatsapp-business-api-empresarial',
   'dctfweb-automacao',
   'lgpd-escritorio-contabil',
 ]

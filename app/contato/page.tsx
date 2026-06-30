@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { COMPANY, buildWhatsAppUrl } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Contato',
-  description: `Entre em contato com a ${COMPANY.name}. WhatsApp direto, sem formulário, sem espera.`,
+  title: 'Contato — vamos conversar sobre seu projeto',
+  description: `Fale com a ${COMPANY.name} sobre seu projeto de software, infraestrutura ou consultoria de TI. Atendimento nacional, base no Rio de Janeiro.`,
+  alternates: { canonical: '/contato' },
 }
 
 export default function ContatoPage() {

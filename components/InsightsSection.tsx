@@ -5,24 +5,24 @@ import { useEffect, useRef, useState } from 'react'
 
 const posts = [
   {
-    title: 'Reforma tributária 2026: o que muda no sistema do seu escritório contábil',
-    readTime: '8 min',
+    title: 'Reforma tributária 2026: IBS e CBS — o que muda no sistema da sua empresa',
+    readTime: '9 min',
     category: 'Reforma Tributária',
     slug: 'reforma-tributaria-2026',
     num: '01',
   },
   {
-    title: 'DCTFWeb sem erro: automação real para escritórios contábeis',
-    readTime: '6 min',
-    category: 'Automação Fiscal',
-    slug: 'dctfweb-automacao',
+    title: 'Como migrar Visual FoxPro para web sem parar a operação',
+    readTime: '11 min',
+    category: 'Modernização',
+    slug: 'migrar-visual-foxpro-web',
     num: '02',
   },
   {
-    title: 'LGPD no escritório contábil: checklist de 23 itens auditados',
-    readTime: '10 min',
-    category: 'LGPD',
-    slug: 'lgpd-escritorio-contabil',
+    title: 'WhatsApp Business API empresarial: arquitetura segura para escalar',
+    readTime: '8 min',
+    category: 'Automação',
+    slug: 'whatsapp-business-api-empresarial',
     num: '03',
   },
 ]

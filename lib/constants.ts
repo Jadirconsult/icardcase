@@ -1,5 +1,5 @@
 export const SITE = {
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://icardcase.com.br',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.icardcase.com.br',
   name: 'Icardcase',
   locale: 'pt_BR',
 } as const

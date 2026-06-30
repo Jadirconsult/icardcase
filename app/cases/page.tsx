@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
 
 export const metadata: Metadata = {
-  title: 'Cases',
-  description: 'Sistemas e projetos entregues pela Icardcase para clientes em contabilidade, indústria, estacionamento e órgãos públicos.',
+  title: 'Cases: sistemas sob medida em produção',
+  description: 'Cases reais da Icardcase: ERP industrial, migração de legado, SaaS fiscal e infraestrutura crítica para empresas de todo o Brasil.',
+  alternates: { canonical: '/cases' },
 }
 
 const allCases = [

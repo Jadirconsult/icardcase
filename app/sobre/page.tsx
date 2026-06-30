@@ -3,8 +3,9 @@ import { COMPANY } from '@/lib/constants'
 import { FinalCTA } from '@/components/FinalCTA'
 
 export const metadata: Metadata = {
-  title: 'Sobre nós',
-  description: `Conheça a história da ${COMPANY.name} — 14 anos atendendo escritórios contábeis e empresas financeiras no Rio de Janeiro.`,
+  title: 'Quem somos — tecnologia sob medida desde 2011',
+  description: `Há 14 anos a ${COMPANY.name} constrói sistemas críticos sob medida para empresas de todo o Brasil. Conheça nosso time, a história e a forma de trabalhar. Base no Rio de Janeiro.`,
+  alternates: { canonical: '/sobre' },
 }
 
 export default function SobrePage() {

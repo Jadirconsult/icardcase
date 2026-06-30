@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://icardcase.com.br'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.icardcase.com.br'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -43,7 +43,8 @@ export const metadata: Metadata = {
   publisher: 'Icardcase',
   referrer: 'strict-origin-when-cross-origin',
   formatDetection: { email: false, address: false, telephone: false },
-  alternates: { canonical: siteUrl },
+  // Sem canonical global: cada rota define o seu (relativo) — evita que páginas
+  // internas herdem o canonical da home e sejam tratadas como duplicata.
   appleWebApp: {
     capable: true,
     title: 'Icardcase',

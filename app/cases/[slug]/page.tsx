@@ -54,7 +54,11 @@ export async function generateMetadata({ params }: { params: CasePageParams }): 
   const { slug } = await params
   const c = CASES[slug]
   if (!c) return { title: 'Não encontrado' }
-  return { title: c.title, description: c.subtitle }
+  return {
+    title: c.title,
+    description: c.subtitle,
+    alternates: { canonical: `/cases/${slug}` },
+  }
 }
 
 export default async function CasePage({ params }: { params: CasePageParams }) {

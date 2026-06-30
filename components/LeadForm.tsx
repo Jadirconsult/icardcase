@@ -134,17 +134,17 @@ export function LeadForm() {
 
   if (state === 'success') {
     return (
-      <div className="bg-surface-alt border border-accent/20 rounded-lg p-8 text-center">
+      <div className="surface-card p-8 text-center border-accent/30">
         <CheckCircle2 className="h-12 w-12 text-accent mx-auto mb-4" aria-hidden="true" />
         <h3 className="text-xl font-semibold text-ink mb-2">Contato recebido!</h3>
-        <p className="text-muted leading-relaxed">
+        <p className="text-ink-muted leading-relaxed">
           O próprio Jadir Luiz vai responder via WhatsApp em até <strong className="text-ink">4 horas úteis</strong>.
           Se for urgente, mande mensagem direto no WhatsApp pra agilizar.
         </p>
         <button
           type="button"
           onClick={() => setState('idle')}
-          className="mt-6 text-sm text-accent hover:underline font-medium"
+          className="mt-6 text-sm text-accent hover:text-accent-hover hover:underline font-medium"
         >
           Enviar outro contato
         </button>
@@ -186,10 +186,10 @@ export function LeadForm() {
             disabled={state === 'submitting'}
             aria-invalid={!!fieldErrors.nome}
             aria-describedby={fieldErrors.nome ? 'nome-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.nome?.[0] && (
-            <p id="nome-error" className="mt-1 text-xs text-red-600">{fieldErrors.nome[0]}</p>
+            <p id="nome-error" className="mt-1 text-xs text-red-400">{fieldErrors.nome[0]}</p>
           )}
         </div>
 
@@ -210,10 +210,10 @@ export function LeadForm() {
             disabled={state === 'submitting'}
             aria-invalid={!!fieldErrors.empresa}
             aria-describedby={fieldErrors.empresa ? 'empresa-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.empresa?.[0] && (
-            <p id="empresa-error" className="mt-1 text-xs text-red-600">{fieldErrors.empresa[0]}</p>
+            <p id="empresa-error" className="mt-1 text-xs text-red-400">{fieldErrors.empresa[0]}</p>
           )}
         </div>
       </div>
@@ -236,10 +236,10 @@ export function LeadForm() {
             disabled={state === 'submitting'}
             aria-invalid={!!fieldErrors.email}
             aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.email?.[0] && (
-            <p id="email-error" className="mt-1 text-xs text-red-600">{fieldErrors.email[0]}</p>
+            <p id="email-error" className="mt-1 text-xs text-red-400">{fieldErrors.email[0]}</p>
           )}
         </div>
 
@@ -260,10 +260,10 @@ export function LeadForm() {
             disabled={state === 'submitting'}
             aria-invalid={!!fieldErrors.whatsapp}
             aria-describedby={fieldErrors.whatsapp ? 'whatsapp-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60"
+            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.whatsapp?.[0] && (
-            <p id="whatsapp-error" className="mt-1 text-xs text-red-600">{fieldErrors.whatsapp[0]}</p>
+            <p id="whatsapp-error" className="mt-1 text-xs text-red-400">{fieldErrors.whatsapp[0]}</p>
           )}
         </div>
       </div>
@@ -278,7 +278,7 @@ export function LeadForm() {
           value={data.segmento}
           onChange={(e) => update('segmento', e.target.value as FormData['segmento'])}
           disabled={state === 'submitting'}
-          className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60 bg-white"
+          className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
         >
           <option value="">Selecione…</option>
           <option value="contabilidade">Escritório contábil</option>
@@ -291,7 +291,7 @@ export function LeadForm() {
       <div>
         <label htmlFor="mensagem" className="block text-sm font-medium text-ink mb-1.5">
           Sobre seu projeto *
-          <span className="text-muted font-normal ml-2 text-xs">(quanto mais contexto, melhor)</span>
+          <span className="text-ink-subtle font-normal ml-2 text-xs">(quanto mais contexto, melhor)</span>
         </label>
         <textarea
           id="mensagem"
@@ -306,17 +306,17 @@ export function LeadForm() {
           placeholder="Conta um pouco sobre o que você precisa: sistema novo? migração de legado? suporte recorrente? infraestrutura?"
           aria-invalid={!!fieldErrors.mensagem}
           aria-describedby={fieldErrors.mensagem ? 'mensagem-error mensagem-counter' : 'mensagem-counter'}
-          className="w-full px-4 py-2.5 rounded-md border border-ink-100 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors disabled:opacity-60 resize-y"
+          className="w-full px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60 resize-y"
         />
-        <p id="mensagem-counter" className="mt-1 text-xs text-muted">
+        <p id="mensagem-counter" className="mt-1 text-xs text-ink-subtle">
           {data.mensagem.length}/2000 caracteres
         </p>
         {fieldErrors.mensagem?.[0] && (
-          <p id="mensagem-error" className="mt-1 text-xs text-red-600">{fieldErrors.mensagem[0]}</p>
+          <p id="mensagem-error" className="mt-1 text-xs text-red-400">{fieldErrors.mensagem[0]}</p>
         )}
       </div>
 
-      <div className="flex items-start gap-3 bg-surface-alt rounded-md p-4">
+      <div className="flex items-start gap-3 rounded-md border border-hairline bg-surface-1/60 p-4">
         <input
           type="checkbox"
           id="consentimento"
@@ -324,11 +324,11 @@ export function LeadForm() {
           checked={data.consentimentoLgpd}
           onChange={(e) => update('consentimentoLgpd', e.target.checked)}
           disabled={state === 'submitting'}
-          className="mt-0.5 h-4 w-4 rounded border-ink-100 text-accent focus:ring-2 focus:ring-accent/20"
+          className="mt-0.5 h-4 w-4 rounded border-hairline-strong bg-surface-2 text-accent focus:ring-2 focus:ring-accent/30"
         />
-        <label htmlFor="consentimento" className="text-sm text-ink/80 leading-relaxed">
+        <label htmlFor="consentimento" className="text-sm text-ink-muted leading-relaxed">
           Concordo com a{' '}
-          <a href="/politica-privacidade" target="_blank" className="text-accent hover:underline font-medium">
+          <a href="/politica-privacidade" target="_blank" className="text-accent hover:text-accent-hover hover:underline font-medium">
             Política de Privacidade
           </a>{' '}
           da Icardcase e autorizo o tratamento dos meus dados para contato comercial,
@@ -337,16 +337,16 @@ export function LeadForm() {
       </div>
 
       {state === 'error' && errorMessage && (
-        <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-md p-4">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-red-700">{errorMessage}</p>
+        <div className="flex items-start gap-3 rounded-md border border-red-500/40 bg-red-950/40 p-4" role="alert">
+          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-sm text-red-200">{errorMessage}</p>
         </div>
       )}
 
       <button
         type="submit"
         disabled={state === 'submitting' || !data.consentimentoLgpd}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:bg-ink-100 disabled:text-muted disabled:cursor-not-allowed text-white px-8 py-3 rounded-md font-medium transition-colors"
+        className="w-full sm:w-auto inline-flex min-h-[44px] items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:bg-surface-2 disabled:text-ink-tertiary disabled:cursor-not-allowed text-white px-8 py-3 rounded-md font-medium transition-colors"
       >
         {state === 'submitting' ? (
           <>
@@ -358,7 +358,7 @@ export function LeadForm() {
         )}
       </button>
 
-      <p className="text-xs text-muted">
+      <p className="text-xs text-ink-subtle">
         * Campos obrigatórios. Não compartilhamos seus dados.
       </p>
     </form>

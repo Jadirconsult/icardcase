@@ -7,6 +7,8 @@ const routes = [
   { url: '/cases', priority: 0.9, changeFrequency: 'weekly' as const },
   { url: '/insights', priority: 0.9, changeFrequency: 'weekly' as const },
   { url: '/contato', priority: 0.7, changeFrequency: 'monthly' as const },
+  // Páginas de serviço — SEO orgânico nacional
+  { url: '/desenvolvimento-de-sistemas', priority: 0.9, changeFrequency: 'monthly' as const },
   { url: '/politica-de-privacidade', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/termos-de-uso', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/lgpd', priority: 0.3, changeFrequency: 'yearly' as const },

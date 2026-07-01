@@ -556,20 +556,23 @@ export default async function PostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <article className="section-y bg-white">
+      <article className="section-y">
         <div className="container-content max-w-prose-wide">
-          <Link href="/insights" className="text-sm font-semibold text-brand-blue hover:underline inline-flex items-center gap-1">
+          <Link
+            href="/insights"
+            className="inline-flex items-center gap-1 text-sm font-mono uppercase tracking-[0.12em] text-accent-hover hover:text-accent link-underline"
+          >
             ← Todos os insights
           </Link>
-          <p className="mt-6 section-kicker">{post.category} · {post.readTime}</p>
-          <h1 className="mt-2 text-h1 font-semibold text-brand-navy">{post.title}</h1>
+          <p className="mt-8 section-kicker">{post.category} · {post.readTime}</p>
+          <h1 className="mt-2 text-display-lg text-ink">{post.title}</h1>
 
-          <div className="mt-10 prose-content text-base leading-relaxed text-brand-gray whitespace-pre-line">
+          <div className="prose-icardcase mt-12 whitespace-pre-line">
             {post.content}
           </div>
 
-          <div className="mt-12 pt-8 border-t border-brand-navy/10 text-sm text-brand-gray">
-            Por <strong className="text-brand-navy">Jadir Luiz de Oliveira Junior</strong> · CEO Icardcase
+          <div className="mt-14 pt-8 border-t border-hairline text-sm text-ink-subtle">
+            Por <strong className="text-ink font-semibold">Jadir Luiz de Oliveira Junior</strong> · CEO Icardcase
           </div>
         </div>
       </article>

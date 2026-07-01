@@ -107,40 +107,50 @@ export default async function CasePage({ params }: { params: CasePageParams }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <article className="section-y bg-white">
+      <article className="section-y">
         <div className="container-content max-w-prose-wide">
-          <Link href="/cases" className="text-sm font-semibold text-brand-blue hover:underline">
+          <Link
+            href="/cases"
+            className="inline-flex items-center gap-1 text-sm font-mono uppercase tracking-[0.12em] text-accent-hover hover:text-accent link-underline"
+          >
             ← Todos os cases
           </Link>
-          <p className="mt-6 section-kicker">{c.segment}</p>
-          <h1 className="mt-2 text-h1 font-semibold text-brand-navy">{c.title}</h1>
-          <p className="mt-2 text-lg text-brand-gray">{c.subtitle}</p>
+          <p className="mt-8 section-kicker">{c.segment}</p>
+          <h1 className="mt-2 text-display-lg text-ink">{c.title}</h1>
+          <p className="mt-4 text-body-lg text-ink-muted">{c.subtitle}</p>
 
-          <div className="mt-10 space-y-8">
+          <div className="mt-12 space-y-10">
             <section>
-              <h2 className="text-h3 font-semibold text-brand-navy">Desafio</h2>
-              <p className="mt-3 text-base leading-relaxed text-brand-gray">{c.problem}</p>
+              <h2 className="text-headline text-ink">Desafio</h2>
+              <p className="mt-4 text-base leading-[1.65] text-ink-muted">{c.problem}</p>
             </section>
             <section>
-              <h2 className="text-h3 font-semibold text-brand-navy">Solução</h2>
-              <p className="mt-3 text-base leading-relaxed text-brand-gray">{c.solution}</p>
+              <h2 className="text-headline text-ink">Solução</h2>
+              <p className="mt-4 text-base leading-[1.65] text-ink-muted">{c.solution}</p>
             </section>
             <section>
-              <h2 className="text-h3 font-semibold text-brand-navy">Resultados</h2>
-              <ul className="mt-3 space-y-2">
+              <h2 className="text-headline text-ink">Resultados</h2>
+              <ul className="mt-4 space-y-3">
                 {c.results.map((r) => (
-                  <li key={r} className="flex gap-2 items-start text-base text-brand-gray">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" className="flex-shrink-0 mt-0.5"><polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    {r}
+                  <li key={r} className="flex gap-3 items-start text-base text-ink-muted leading-[1.6]">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" className="flex-shrink-0 mt-1" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span>{r}</span>
                   </li>
                 ))}
               </ul>
             </section>
             <section>
-              <h2 className="text-h3 font-semibold text-brand-navy">Stack</h2>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <h2 className="text-headline text-ink">Stack</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
                 {c.tech.map((t) => (
-                  <span key={t} className="tag">{t}</span>
+                  <span
+                    key={t}
+                    className="inline-flex items-center rounded-md border border-hairline bg-surface-1 px-3 py-1.5 font-mono text-xs text-ink-muted"
+                  >
+                    {t}
+                  </span>
                 ))}
               </div>
             </section>

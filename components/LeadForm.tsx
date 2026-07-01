@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 
@@ -28,6 +28,15 @@ export function LeadForm() {
   const [errorMessage, setErrorMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const searchParams = useSearchParams()
+  const successRef = useRef<HTMLDivElement>(null)
+
+  // A11y: quando entra em success, move foco pra o card — leitor de tela
+  // anuncia a confirmação sem depender de o usuário estar navegando.
+  useEffect(() => {
+    if (state === 'success' && successRef.current) {
+      successRef.current.focus()
+    }
+  }, [state])
 
   // Captura UTMs da URL
   const [utms, setUtms] = useState({
@@ -134,7 +143,13 @@ export function LeadForm() {
 
   if (state === 'success') {
     return (
-      <div className="surface-card p-8 text-center border-accent/30">
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        role="status"
+        aria-live="polite"
+        className="surface-card p-8 text-center border-accent/30 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-canvas"
+      >
         <CheckCircle2 className="h-12 w-12 text-accent mx-auto mb-4" aria-hidden="true" />
         <h3 className="text-xl font-semibold text-ink mb-2">Contato recebido!</h3>
         <p className="text-ink-muted leading-relaxed">
@@ -189,7 +204,7 @@ export function LeadForm() {
             className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.nome?.[0] && (
-            <p id="nome-error" className="mt-1 text-xs text-red-400">{fieldErrors.nome[0]}</p>
+            <p id="nome-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.nome[0]}</p>
           )}
         </div>
 
@@ -213,7 +228,7 @@ export function LeadForm() {
             className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.empresa?.[0] && (
-            <p id="empresa-error" className="mt-1 text-xs text-red-400">{fieldErrors.empresa[0]}</p>
+            <p id="empresa-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.empresa[0]}</p>
           )}
         </div>
       </div>
@@ -239,7 +254,7 @@ export function LeadForm() {
             className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.email?.[0] && (
-            <p id="email-error" className="mt-1 text-xs text-red-400">{fieldErrors.email[0]}</p>
+            <p id="email-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.email[0]}</p>
           )}
         </div>
 
@@ -263,7 +278,7 @@ export function LeadForm() {
             className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
           />
           {fieldErrors.whatsapp?.[0] && (
-            <p id="whatsapp-error" className="mt-1 text-xs text-red-400">{fieldErrors.whatsapp[0]}</p>
+            <p id="whatsapp-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.whatsapp[0]}</p>
           )}
         </div>
       </div>
@@ -280,7 +295,7 @@ export function LeadForm() {
           disabled={state === 'submitting'}
           className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
         >
-          <option value="">Selecione…</option>
+          <option value="" disabled>Selecione…</option>
           <option value="contabilidade">Escritório contábil</option>
           <option value="financeira">Financeira / Crédito</option>
           <option value="industria">Indústria / Empresa</option>
@@ -312,7 +327,7 @@ export function LeadForm() {
           {data.mensagem.length}/2000 caracteres
         </p>
         {fieldErrors.mensagem?.[0] && (
-          <p id="mensagem-error" className="mt-1 text-xs text-red-400">{fieldErrors.mensagem[0]}</p>
+          <p id="mensagem-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.mensagem[0]}</p>
         )}
       </div>
 

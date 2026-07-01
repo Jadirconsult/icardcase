@@ -17,20 +17,55 @@ const posts = [
 
 export default function InsightsPage() {
   return (
-    <section className="section-y bg-white">
+    <section className="section-y">
       <div className="container-content">
         <p className="section-kicker">INSIGHTS</p>
-        <h1 className="mt-2 text-h1 font-semibold text-brand-navy max-w-2xl">
-          Conteúdo técnico que aplicamos antes de publicar.
+        <h1 className="mt-2 text-display-lg text-ink max-w-2xl">
+          Conhecimento aplicado.
+          <span className="block text-ink-muted">Antes de publicado.</span>
         </h1>
 
-        <ul className="mt-12 space-y-6">
-          {posts.map((post) => (
+        <ul className="mt-14 border-t border-hairline">
+          {posts.map((post, i) => (
             <li key={post.slug}>
-              <Link href={`/insights/${post.slug}`} className="group block border-b border-brand-navy/10 pb-6 hover:border-brand-blue transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wider text-brand-blue">{post.category} · {post.readTime} de leitura</p>
-                <h2 className="mt-2 text-xl font-semibold text-brand-navy group-hover:text-brand-blue transition-colors">{post.title}</h2>
-                <p className="mt-2 text-sm text-brand-gray max-w-2xl">{post.excerpt}</p>
+              <Link
+                href={`/insights/${post.slug}`}
+                className="group flex items-baseline gap-6 py-7 border-b border-hairline transition-all duration-300 hover:border-hairline-strong"
+              >
+                <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-3 mb-2">
+                    <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">
+                      {post.category}
+                    </span>
+                    <span className="text-ink-tertiary">·</span>
+                    <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">
+                      {post.readTime} de leitura
+                    </span>
+                  </div>
+                  <h2 className="text-headline text-ink leading-snug transition-colors duration-300 group-hover:text-accent max-w-[60ch]">
+                    {post.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-ink-subtle max-w-[60ch]">
+                    {post.excerpt}
+                  </p>
+                </div>
+
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="flex-shrink-0 self-center text-ink-tertiary transition-all duration-500 group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1"
+                  aria-hidden="true"
+                >
+                  <path d="M7 17L17 7M7 7h10v10" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </Link>
             </li>
           ))}

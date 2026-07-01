@@ -1,8 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Code2, Network, Headphones, ShieldCheck, Lightbulb } from 'lucide-react'
-import { buildWhatsAppUrl } from '@/lib/constants'
 
 const services = [
   {
@@ -10,30 +10,35 @@ const services = [
     num: '01',
     title: 'Desenvolvimento de Sistemas',
     description: 'Sistemas web e mobile sob medida. Integração SEFAZ, multi-tenant, dashboards executivos.',
+    href: '/desenvolvimento-de-sistemas',
   },
   {
     icon: Network,
     num: '02',
     title: 'Infraestrutura e Redes',
     description: 'Servidores Windows e Linux, redes corporativas, virtualização e cloud híbrida.',
+    href: '/infraestrutura-de-ti',
   },
   {
     icon: Headphones,
     num: '03',
     title: 'Suporte Técnico',
     description: 'SLA definido, atendimento humano, sem call center. Contrato mensal ou pacote de horas. Suporte presencial na região do Rio de Janeiro; remoto para todo o Brasil.',
+    href: '/contato',
   },
   {
     icon: ShieldCheck,
     num: '04',
     title: 'Segurança e Backup',
     description: 'LGPD aplicada, política de backup testada, auditoria e headers de segurança.',
+    href: '/seguranca-lgpd',
   },
   {
     icon: Lightbulb,
     num: '05',
     title: 'Consultoria em TI',
     description: 'Avaliação técnica, escolha de stack, modernização de legado e due diligence.',
+    href: '/consultoria-ti',
   },
 ]
 
@@ -89,12 +94,8 @@ export function Services() {
               }`}
               style={{ transitionDelay: `${index * 110}ms` }}
             >
-              <a
-                href={buildWhatsAppUrl(
-                  `Olá! Vim pelo site da Icardcase e quero conversar sobre ${service.title}.`,
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={service.href}
                 className="card-glow relative block h-full p-7 transition-colors duration-500 hover:bg-surface-1"
               >
                 <div
@@ -129,7 +130,7 @@ export function Services() {
                 </p>
 
                 <div className="mt-6 flex items-center gap-1 text-xs font-mono uppercase tracking-[0.1em] text-ink-tertiary opacity-0 -translate-y-1 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 group-hover:text-accent">
-                  <span>Conversar</span>
+                  <span>Ver detalhes</span>
                   <svg
                     width="12"
                     height="12"
@@ -143,7 +144,7 @@ export function Services() {
                     <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

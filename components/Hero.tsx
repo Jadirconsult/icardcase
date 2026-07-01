@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { buildWhatsAppUrl } from '@/lib/constants'
+import { AnimatedCounter } from '@/components/AnimatedCounter'
 
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null)
@@ -44,6 +45,9 @@ export function Hero() {
       ref={heroRef}
       className="relative isolate overflow-hidden bg-canvas pt-24 pb-28 sm:pt-32 sm:pb-36 lg:pt-40 lg:pb-44"
     >
+      {/* Aurora glow — 2 luzes accent driftando lentas atrás de tudo */}
+      <div className="aurora" aria-hidden="true" />
+
       {/* gradient mesh com parallax sutil */}
       <div
         className="bg-mesh absolute inset-0 pointer-events-none transition-transform duration-300 ease-out"
@@ -231,10 +235,10 @@ export function Hero() {
         >
           <div className="grid grid-cols-2 gap-y-10 gap-x-12 sm:grid-cols-4">
             {[
-              { value: '14', unit: 'anos', label: 'no mercado de TI brasileiro' },
-              { value: '5', unit: 'frentes', label: 'sistemas, infra, suporte, segurança, consultoria' },
-              { value: '99.5%', unit: 'uptime', label: 'em infraestrutura crítica' },
-              { value: '6', unit: 'camadas', label: 'de segurança aplicadas' },
+              { to: 14, decimals: 0, suffix: '', unit: 'anos', label: 'no mercado de TI brasileiro' },
+              { to: 5, decimals: 0, suffix: '', unit: 'frentes', label: 'sistemas, infra, suporte, segurança, consultoria' },
+              { to: 99.5, decimals: 1, suffix: '%', unit: 'uptime', label: 'em infraestrutura crítica' },
+              { to: 6, decimals: 0, suffix: '', unit: 'camadas', label: 'de segurança aplicadas' },
             ].map((stat, i) => (
               <div
                 key={stat.label}
@@ -244,9 +248,12 @@ export function Hero() {
                 style={{ transitionDelay: `${440 + i * 60}ms` }}
               >
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-display-md text-ink transition-colors duration-300 group-hover:text-accent">
-                    {stat.value}
-                  </span>
+                  <AnimatedCounter
+                    to={stat.to}
+                    decimals={stat.decimals}
+                    suffix={stat.suffix}
+                    className="text-display-md text-ink transition-colors duration-300 group-hover:text-accent"
+                  />
                   <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-subtle">
                     {stat.unit}
                   </span>

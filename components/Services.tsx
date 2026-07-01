@@ -95,7 +95,7 @@ export function Services() {
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative block h-full p-7 transition-colors duration-500 hover:bg-surface-1"
+                className="card-glow relative block h-full p-7 transition-colors duration-500 hover:bg-surface-1"
               >
                 <div
                   className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"

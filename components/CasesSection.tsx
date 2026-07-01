@@ -96,7 +96,7 @@ export function CasesSection() {
             <Link
               key={c.href}
               href={c.href}
-              className={`group surface-card relative overflow-hidden p-7 lg:p-8 transition-all duration-500 ease-out ${
+              className={`group surface-card card-glow relative overflow-hidden p-7 lg:p-8 transition-all duration-500 ease-out ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
               } hover:-translate-y-1`}
               style={{ transitionDelay: `${i * 100}ms` }}

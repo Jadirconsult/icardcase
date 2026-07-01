@@ -134,6 +134,96 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
   }
 
+  /* ─── Aurora glow (Hero) ─ luzes accent driftando lentas ────────── */
+  .aurora {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .aurora::before,
+  .aurora::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+  }
+  .aurora::before {
+    top: -15%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 70%);
+    animation: aurora-drift-a 18s ease-in-out infinite;
+  }
+  .aurora::after {
+    bottom: -15%;
+    right: -8%;
+    width: 55%;
+    height: 55%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.28) 0%, rgba(59, 130, 246, 0) 70%);
+    animation: aurora-drift-b 22s ease-in-out infinite;
+  }
+  @keyframes aurora-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33%      { transform: translate3d(12%, -6%, 0) scale(1.1); }
+    66%      { transform: translate3d(-6%, 10%, 0) scale(0.95); }
+  }
+  @keyframes aurora-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(-14%, -8%, 0) scale(1.15); }
+  }
+
+  /* ─── Card glow on hover ─ gradient border + inner spot ─────────── */
+  .card-glow {
+    position: relative;
+    isolation: isolate;
+  }
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(37, 99, 235, 0.75) 0%,
+      rgba(37, 99, 235, 0) 35%,
+      rgba(37, 99, 235, 0) 65%,
+      rgba(37, 99, 235, 0.5) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .card-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at 50% 0%,
+      rgba(37, 99, 235, 0.10) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .card-glow:hover::before,
+  .card-glow:hover::after,
+  .card-glow:focus-visible::before,
+  .card-glow:focus-visible::after {
+    opacity: 1;
+  }
+
   /* ─── Top-edge highlight (Linear's 'pixel rendered' feel) ───────── */
   .edge-highlight {
     position: relative;

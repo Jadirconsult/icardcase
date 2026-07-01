@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Hero } from '@/components/Hero'
+import { ClientSectors } from '@/components/ClientSectors'
 import { Services } from '@/components/Services'
 import { DataUnification } from '@/components/DataUnification'
 import { Differentials } from '@/components/Differentials'
@@ -17,6 +18,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <ClientSectors />
       <Services />
       <DataUnification />
       <Differentials />

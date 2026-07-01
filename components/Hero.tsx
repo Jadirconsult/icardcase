@@ -69,9 +69,10 @@ export function Hero() {
         }}
       />
 
-      {/* constellation animada — 9 nodes + lines, lateral direita */}
+      {/* constellation animada — 9 nodes + lines, lateral direita
+          opacidade reduzida (auditoria A3: hero estava competindo por retina) */}
       <div
-        className="absolute -right-12 top-1/2 -translate-y-1/2 h-[120%] w-[55%] pointer-events-none mix-blend-screen hidden md:block transition-transform duration-500 ease-out"
+        className="absolute -right-12 top-1/2 -translate-y-1/2 h-[120%] w-[55%] pointer-events-none mix-blend-screen hidden md:block transition-transform duration-500 ease-out opacity-60"
         aria-hidden="true"
         style={{ transform: `translate3d(${parallax.x * -24}px, ${parallax.y * -12 - 50}%, 0)` }}
       >
@@ -148,7 +149,9 @@ export function Hero() {
           </span>
         </div>
 
-        {/* Headline display-xl — entra com stagger, tracking negativo agressivo */}
+        {/* Headline display-xl — entra com stagger, tracking negativo agressivo.
+            Auditoria A3: gradient removido do 'conecta.' (competia com o accent
+            do CTA e parecia link). Cursor pulsante no fim da frase mantido. */}
         <h1 aria-label="Tecnologia que conecta. Soluções que transformam." className="mt-8 max-w-[18ch] text-display-xl text-ink">
           <span
             className={`block transition-all duration-500 ease-out ${
@@ -164,7 +167,7 @@ export function Hero() {
             }`}
             style={{ transitionDelay: '120ms' }}
           >
-            <span className="bg-gradient-to-r from-ink via-ink to-accent bg-clip-text text-transparent">conecta.</span>
+            conecta.
           </span>
           <span
             className={`block text-ink transition-all duration-500 ease-out ${
@@ -177,14 +180,16 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Subhead */}
+        {/* Subhead — auditoria A3: cortado pela metade (Linear/Vercel usam
+            15-25 palavras). Tom institucional 'nós' em vez do 'eu' pra manter
+            coerência com o resto do site. */}
         <p
-          className={`mt-8 max-w-[58ch] text-lg leading-[1.55] text-ink-subtle sm:text-xl transition-all duration-500 ease-out ${
+          className={`mt-8 max-w-[52ch] text-lg leading-[1.5] text-ink-subtle sm:text-xl transition-all duration-500 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
           style={{ transitionDelay: '240ms' }}
         >
-          Soluções web e mobile sob medida para qualquer desafio do seu negócio. Tem um processo travado, um sistema que ainda não existe ou uma ideia que precisa sair do papel? Eu resolvo — da automação a sistemas completos — com infraestrutura confiável, segurança aplicada e atendimento direto comigo, sem terceirizações e sem call center.
+          Sistemas sob medida, infraestrutura confiável e segurança aplicada — atendimento direto, sem call center, sem terceirizações.
         </p>
 
         {/* CTAs Linear-spec */}
@@ -267,17 +272,19 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Faixa de exclusividade — Linear-style: hairline + surface-1 lift */}
+      {/* Faixa de posicionamento — auditoria B4: substitui 'Vagas limitadas 2026'
+          (sem número, parecia técnica de vendedor) por posicionamento concreto:
+          modelo boutique + volume real. */}
       <div className="edge-highlight relative mt-24 sm:mt-32 border-y border-hairline bg-surface-1/40 backdrop-blur-sm">
         <div className="container-content flex flex-wrap items-center gap-3 py-5 text-sm">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent-hover">
-            Vagas limitadas · 2026
+            Modelo boutique · Portfólio curado
           </span>
           <span className="text-ink-muted">
-            Trabalhamos com poucos clientes por ano. Atendimento dedicado, parceria de longo prazo.
+            Aceitamos até 4 novos clientes por trimestre. Parceria de longo prazo, atendimento direto com o CEO.
           </span>
         </div>
       </div>

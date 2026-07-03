@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 
 const nav = [
   { label: 'Soluções', href: '/#solucoes' },
+  { label: 'Raio-X de TI', href: '/raio-x-de-ti' },
   { label: 'Cases', href: '/cases' },
   { label: 'Insights', href: '/insights' },
   { label: 'Sobre', href: '/sobre' },

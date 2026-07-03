@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 
@@ -150,8 +151,18 @@ export function LeadForm() {
         aria-live="polite"
         className="surface-card p-8 text-center border-accent/30 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-canvas"
       >
-        <CheckCircle2 className="h-12 w-12 text-accent mx-auto mb-4" aria-hidden="true" />
-        <h3 className="text-xl font-semibold text-ink mb-2">Contato recebido!</h3>
+        <Image
+          src="/icardinho.png"
+          alt=""
+          width={128}
+          height={118}
+          aria-hidden="true"
+          className="mx-auto mb-4 drop-shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
+        />
+        <h3 className="text-xl font-semibold text-ink mb-2">
+          <CheckCircle2 className="inline h-5 w-5 text-accent mr-1.5 -mt-0.5" aria-hidden="true" />
+          Contato recebido!
+        </h3>
         <p className="text-ink-muted leading-relaxed">
           O próprio Jadir Luiz vai responder via WhatsApp em até <strong className="text-ink">4 horas úteis</strong>.
           Se for urgente, mande mensagem direto no WhatsApp pra agilizar.

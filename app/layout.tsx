@@ -6,6 +6,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
 import { ConditionalChrome } from '@/components/ConditionalChrome'
+import { GoogleTag } from '@/components/GoogleTag'
 import './globals.css'
 
 const inter = Inter({
@@ -167,6 +168,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span className="sr-only">WhatsApp</span>
           </WhatsAppButton>
         </ConditionalChrome>
+        {/* Google tag (Ads) + conversão de clique WhatsApp — só renderiza
+            com NEXT_PUBLIC_GOOGLE_ADS_ID / _WHATSAPP_LABEL configuradas */}
+        <GoogleTag />
         {/* Vercel Analytics — page views + eventos */}
         <Analytics />
         {/* Vercel Speed Insights — Core Web Vitals reais (RUM) */}

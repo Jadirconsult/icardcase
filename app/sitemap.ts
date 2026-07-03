@@ -13,6 +13,8 @@ const routes = [
   { url: '/infraestrutura-de-ti', priority: 0.9, changeFrequency: 'monthly' as const },
   { url: '/seguranca-lgpd', priority: 0.9, changeFrequency: 'monthly' as const },
   { url: '/consultoria-ti', priority: 0.9, changeFrequency: 'monthly' as const },
+  // Landing de oferta — campanha de captação (contabilidades)
+  { url: '/raio-x-de-ti', priority: 0.8, changeFrequency: 'monthly' as const },
   { url: '/politica-de-privacidade', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/termos-de-uso', priority: 0.3, changeFrequency: 'yearly' as const },
   { url: '/lgpd', priority: 0.3, changeFrequency: 'yearly' as const },

@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { ConditionalChrome } from '@/components/ConditionalChrome'
 import './globals.css'
 
 const inter = Inter({
@@ -154,12 +155,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo principal
         </a>
-        <Header />
+        {/* ConditionalChrome: landings de tráfego pago (ex.: /raio-x-de-ti)
+            renderizam sem Header/Footer/float — página isolada, sem rota de fuga. */}
+        <ConditionalChrome>
+          <Header />
+        </ConditionalChrome>
         <main id="main-content" tabIndex={-1} className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppButton origem="float_button" variant="float">
-          <span className="sr-only">WhatsApp</span>
-        </WhatsAppButton>
+        <ConditionalChrome>
+          <Footer />
+          <WhatsAppButton origem="float_button" variant="float">
+            <span className="sr-only">WhatsApp</span>
+          </WhatsAppButton>
+        </ConditionalChrome>
         {/* Vercel Analytics — page views + eventos */}
         <Analytics />
         {/* Vercel Speed Insights — Core Web Vitals reais (RUM) */}

@@ -29,7 +29,12 @@ export function AnimatedCounter({
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null)
   const started = useRef(false)
-  const [current, setCurrent] = useState(0)
+  // SSR-fix (auditoria 07/2026): estado inicial = valor final, não 0.
+  // O HTML servido mostrava "0 anos no mercado" / "0.0% uptime" para
+  // Googlebot, leitores de IA e qualquer cliente sem JS. Agora o valor
+  // real está no HTML; a animação (0 → to) só roda no client, ao entrar
+  // na viewport.
+  const [current, setCurrent] = useState(to)
 
   useEffect(() => {
     const node = ref.current

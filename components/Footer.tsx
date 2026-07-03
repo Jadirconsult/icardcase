@@ -71,16 +71,11 @@ export function Footer() {
                   Instagram · @icardcase
                 </a>
               </li>
-              <li>
-                <a
-                  href={COMPANY.social.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link-underline text-ink-muted hover:text-ink transition-colors"
-                >
-                  LinkedIn · /icardcase
-                </a>
-              </li>
+              {/* Auditoria 07/2026: link do LinkedIn removido temporariamente.
+                  A página da empresa tem 1 seguidor e zero publicações —
+                  mandar decisor B2B pra lá destrói credibilidade. Reativar
+                  quando houver 3-4 posts publicados (cases do site dão o
+                  conteúdo). O href continua em COMPANY.social.linkedin. */}
             </ul>
           </div>
 

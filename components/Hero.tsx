@@ -283,8 +283,12 @@ export function Hero() {
           <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent-hover">
             Modelo boutique · Portfólio curado
           </span>
+          {/* Auditoria 07/2026: removido o número fixo "4 novos clientes por
+              trimestre" — colidia com a escassez da oferta Raio-X ("4
+              diagnósticos/mês") e travava a campanha de captação. Escassez
+              qualitativa mantém o posicionamento boutique sem contradição. */}
           <span className="text-ink-muted">
-            Aceitamos até 4 novos clientes por trimestre. Parceria de longo prazo, atendimento direto com o CEO.
+            Carteira limitada de clientes ativos. Parceria de longo prazo, atendimento direto com o CEO.
           </span>
         </div>
       </div>

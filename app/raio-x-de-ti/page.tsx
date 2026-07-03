@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 import { buildWhatsAppUrl, COMPANY, SITE } from '@/lib/constants'
 
@@ -134,10 +135,16 @@ export default function RaioXPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      {/* Topo mínimo: só logo, sem navegação — landing isolada */}
+      {/* Topo mínimo: só logo (link para a home), sem navegação — landing isolada */}
       <header className="border-b border-hairline bg-canvas">
         <div className="container-content flex items-center justify-between py-5">
-          <Logo variant="dark" />
+          <Link
+            href="/"
+            aria-label="Ir para a página inicial da Icardcase"
+            className="transition-opacity hover:opacity-80"
+          >
+            <Logo variant="dark" />
+          </Link>
           <span className="hidden sm:block font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-subtle">
             TI para contabilidades · Niterói e RJ
           </span>

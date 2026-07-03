@@ -177,7 +177,7 @@ export async function notifyLeadViaEmail(lead: LeadNotification): Promise<void> 
   }
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Icardcase — Lead Form" <${from}>`,
       to,
       replyTo: lead.email, // responder no Gmail volta direto pro cliente
@@ -185,6 +185,7 @@ export async function notifyLeadViaEmail(lead: LeadNotification): Promise<void> 
       text: buildText(lead),
       html: buildHtml(lead),
     })
+    console.log('[Lead] E-mail enviado:', { to, messageId: info.messageId, response: info.response })
   } catch (err) {
     // Falha silenciosa: o lead JÁ está no Supabase, não bloqueia UX.
     console.error('[Lead] Falha SMTP:', err)

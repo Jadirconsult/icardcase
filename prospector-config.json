@@ -1,0 +1,20 @@
+{
+  "assinatura": {
+    "nome": "Jadir Oliveira",
+    "apresentacao": "Especialista em desenvolvimento de sistemas Web/Mobile",
+    "whatsapp": "21 98878-5170"
+  },
+  "prospeccao": {
+    "nichos": ["contabilidades"],
+    "cidade": "BRASIL",
+    "leadsPorBusca": 14
+  },
+  "envio": { "modo": "rascunho" },
+  "hostgator": {
+    "usuario": "",
+    "dominio": "",
+    "servidor": "",
+    "senha": "",
+    "pastaBase": "clientes"
+  }
+}

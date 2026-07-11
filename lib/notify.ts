@@ -11,6 +11,7 @@
  * JÁ FOI gravado no Supabase — a notificação é só "nice to have".
  */
 import nodemailer from 'nodemailer'
+import { sanitizeHeader } from '@/lib/validation'
 
 export interface LeadNotification {
   nome: string
@@ -181,11 +182,16 @@ export async function notifyLeadViaEmail(lead: LeadNotification): Promise<void> 
       from: `"Icardcase — Lead Form" <${from}>`,
       to,
       replyTo: lead.email, // responder no Gmail volta direto pro cliente
-      subject: `[Lead] ${lead.nome} — ${lead.empresa} (${lead.segmento})`,
+      // sanitizeHeader: mata CR/LF vindos de `empresa` (que não tem regex
+      // restritiva no schema) antes de virarem cabeçalho de e-mail.
+      subject: sanitizeHeader(
+        `[Lead] ${lead.nome} — ${lead.empresa} (${lead.segmento})`,
+      ),
       text: buildText(lead),
       html: buildHtml(lead),
     })
-    console.log('[Lead] E-mail enviado:', { to, messageId: info.messageId, response: info.response })
+    // Não logar o destinatário (`to`) — é dado pessoal e não ajuda no debug.
+    console.log('[Lead] E-mail enviado:', { messageId: info.messageId })
   } catch (err) {
     // Falha silenciosa: o lead JÁ está no Supabase, não bloqueia UX.
     console.error('[Lead] Falha SMTP:', err)

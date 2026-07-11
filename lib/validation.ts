@@ -22,7 +22,16 @@ export const leadSchema = z.object({
   consentimentoLgpd: z.literal(true, {
     errorMap: () => ({ message: 'Aceite a política de privacidade' }),
   }),
-  website: z.string().max(0, 'Spam detectado').optional().or(z.literal('')),
+  // HONEYPOT — campo invisível pro humano, irresistível pro bot.
+  //
+  // NÃO validar aqui. Era `.max(0, 'Spam detectado')`, o que rejeitava o bot
+  // logo no safeParse: a rota respondia 400 com
+  // `issues: { website: ['Spam detectado'] }`, entregando de bandeja qual campo
+  // é a armadilha. De quebra, o branch de honeypot do /api/lead (que finge
+  // sucesso com um UUID falso) virava código morto — nunca era alcançado.
+  //
+  // Deixe o valor passar. Quem decide o que fazer com ele é o /api/lead.
+  website: z.string().max(200).optional(),
   utm_source: z.string().max(100).optional(),
   utm_medium: z.string().max(100).optional(),
   utm_campaign: z.string().max(100).optional(),
@@ -37,6 +46,28 @@ export function sanitizeText(input: string): string {
     .replace(/<[^>]*>/g, '')   // remove tags completas (<script>, <img ...>, etc.)
     .replace(/[<>]/g, '')      // remove <> residuais (defesa contra tags malformadas)
     .trim()
+}
+
+/**
+ * Neutraliza um valor que vai virar CABEÇALHO de e-mail (ex.: Subject).
+ *
+ * `nome` e `empresa` entram no subject em lib/notify.ts. `empresa` não tem
+ * regex restritiva, então poderia carregar CR/LF e tentar injetar um cabeçalho
+ * novo. O nodemailer provavelmente já codifica isso, mas não dependemos do
+ * comportamento da lib: quebra de linha em header nunca é legítima.
+ *
+ * Troca todo caractere de controle (< 0x20 e 0x7F, o que inclui CR e LF) por
+ * espaço, e colapsa o resultado.
+ *
+ * NÃO usar em `mensagem` — lá a quebra de linha é conteúdo válido.
+ */
+export function sanitizeHeader(input: string): string {
+  let out = ''
+  for (const ch of input) {
+    const code = ch.codePointAt(0) ?? 0
+    out += code < 0x20 || code === 0x7f ? ' ' : ch
+  }
+  return out.replace(/\s+/g, ' ').trim()
 }
 
 export const whatsappClickSchema = z.object({

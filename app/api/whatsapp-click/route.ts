@@ -2,7 +2,7 @@
  * POST /api/whatsapp-click — telemetria de cliques no WhatsApp
  */
 import { NextResponse, type NextRequest } from 'next/server'
-import { whatsappClickSchema } from '@/lib/validation'
+import { whatsappClickSchema, sanitizeText } from '@/lib/validation'
 import { whatsappClickRateLimit, checkRateLimit, getClientIp, maskIp } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
@@ -61,9 +61,10 @@ export async function POST(request: NextRequest) {
     supabase
       .from('whatsapp_clicks')
       .insert({
-        origem: parsed.data.origem,
-        utm_source: parsed.data.utm_source,
-        utm_campaign: parsed.data.utm_campaign,
+        // Mesmo tratamento de texto que o /api/lead aplica nos campos dele.
+        origem: sanitizeText(parsed.data.origem),
+        utm_source: parsed.data.utm_source ? sanitizeText(parsed.data.utm_source) : null,
+        utm_campaign: parsed.data.utm_campaign ? sanitizeText(parsed.data.utm_campaign) : null,
         ip_address: ip !== 'unknown' ? ip : null,
         user_agent: request.headers.get('user-agent')?.substring(0, 500) ?? null,
         referrer: request.headers.get('referer')?.substring(0, 500) ?? null,

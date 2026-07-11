@@ -10,6 +10,11 @@
  * Proteção: Authorization Bearer com CRON_SECRET — Vercel envia esse header
  * automaticamente em todas as chamadas de cron. Sem o header válido, retorna
  * 401 (impede scraper ou ataque externo de bater a rota).
+ *
+ * FAIL-CLOSED: se CRON_SECRET não estiver definido, a rota recusa TUDO (503).
+ * Antes a checagem era `if (cronSecret && ...)`, que simplesmente sumia quando
+ * a env var faltava — deixando uma rota com service_role (que bypassa RLS)
+ * aberta pra qualquer um. Na dúvida, negar.
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
@@ -22,7 +27,16 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  // Sem secret configurado, a rota não tem como se defender: recusa.
+  if (!cronSecret) {
+    console.error('[KeepAlive] CRÍTICO: CRON_SECRET ausente — rota bloqueada')
+    return NextResponse.json(
+      { ok: false, error: 'Service unavailable' },
+      { status: 503 },
+    )
+  }
+
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json(
       { ok: false, error: 'Unauthorized' },
       { status: 401 },
@@ -34,9 +48,11 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.rpc('increment_no_pause')
 
     if (error) {
+      // Código do erro fica só no log do servidor — não devolver no corpo da
+      // resposta (evita entregar detalhe do schema Postgres pra fora).
       console.error('[KeepAlive] Erro Supabase:', error.code, error.message)
       return NextResponse.json(
-        { ok: false, error: 'Database error', code: error.code },
+        { ok: false, error: 'Database error' },
         { status: 500 },
       )
     }

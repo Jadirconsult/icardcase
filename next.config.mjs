@@ -39,17 +39,23 @@ const securityHeaders = [
   },
 ]
 
-// CORS estrito para /api/* — só aceita requests vindas dos próprios domínios.
-const allowedOrigins = [
-  'https://icardcase.com.br',
-  'https://www.icardcase.com.br',
-  'https://icardcase.vercel.app',
-]
+/**
+ * CORS para /api/*.
+ *
+ * ATENÇÃO — NÃO devolva `Access-Control-Allow-Origin` com uma lista separada
+ * por vírgula (era `allowedOrigins.join(', ')`). A spec aceita UMA origem ou
+ * `*`; uma lista é inválida e o navegador simplesmente rejeita. Funcionava só
+ * por acidente (falhava fechado) e convidava alguém a "consertar" trocando por
+ * `*` — o que abriria a API pra qualquer site da internet.
+ *
+ * A API é same-origin: site e rotas moram no mesmo domínio, então não é preciso
+ * conceder CORS a ninguém. Ficam só os headers que NÃO concedem acesso.
+ * A allowlist de verdade é validada em runtime dentro da rota — ver
+ * isAllowedOrigin() em app/api/whatsapp-click/route.ts.
+ */
 const apiCorsHeaders = [
-  { key: 'Access-Control-Allow-Origin', value: allowedOrigins.join(', ') },
   { key: 'Access-Control-Allow-Methods', value: 'POST, OPTIONS' },
   { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
-  { key: 'Access-Control-Max-Age', value: '86400' },
   { key: 'Vary', value: 'Origin' },
 ]
 

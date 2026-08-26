@@ -96,9 +96,9 @@ export function CasesSection() {
             <Link
               key={c.href}
               href={c.href}
-              className={`group surface-card card-glow relative overflow-hidden p-7 lg:p-8 transition-all duration-500 ease-out ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-              } hover:-translate-y-1`}
+              className={`group surface-card card-glow relative overflow-hidden p-7 lg:p-8 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
+              } hover:-translate-y-1.5`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               {/* edge highlight */}

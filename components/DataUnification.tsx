@@ -60,7 +60,7 @@ export function DataUnification() {
             <span className="block text-ink-muted">não são desorganização.</span>
             <span className="block">São exposição.</span>
           </h2>
-          <p className="mt-8 text-lg leading-[1.55] text-ink-subtle max-w-[58ch]">
+          <p className="mt-8 text-lg leading-[1.55] text-ink-muted max-w-[58ch]">
             Planilhas em Drive, pastas com nomes parecidos, links de compartilhamento
             esquecidos, PDFs baixados fora do sistema. Cada arquivo espalhado é ponto
             de falha em três dimensões que sua auditoria não perdoa.
@@ -71,12 +71,19 @@ export function DataUnification() {
           {risks.map((r, i) => (
             <li
               key={r.title}
-              className={`bg-canvas p-7 transition-all duration-700 ease-out ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+              className={`group relative card-glow bg-canvas p-7 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-surface-1 ${
+                visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
               }`}
               style={{ transitionDelay: `${200 + i * 120}ms` }}
             >
-              <h3 className="text-card-title text-ink leading-snug mb-3">{r.title}</h3>
+              {/* linha de destaque no topo, revela no hover (mesmo motif dos cards de Serviços) */}
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                aria-hidden="true"
+              />
+              <h3 className="text-card-title text-ink leading-snug mb-3 transition-colors duration-300 group-hover:text-accent">
+                {r.title}
+              </h3>
               <p className="text-sm leading-[1.55] text-ink-subtle">{r.desc}</p>
             </li>
           ))}
@@ -88,7 +95,7 @@ export function DataUnification() {
           }`}
           style={{ transitionDelay: '560ms' }}
         >
-          <p className="text-lg leading-[1.55] text-ink-subtle">
+          <p className="text-lg leading-[1.55] text-ink-muted">
             A saída não é 'mais treinamento de equipe' nem 'nova pasta organizada'. É
             infraestrutura: sistema único com <strong className="text-ink font-medium">RLS no banco</strong>,
             <strong className="text-ink font-medium"> audit log imutável</strong>,

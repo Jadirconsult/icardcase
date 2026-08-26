@@ -79,7 +79,7 @@ export function Services() {
             Não é uma agência.
             <span className="block text-ink-muted">É um time embedded.</span>
           </h2>
-          <p className="mt-8 text-lg leading-[1.55] text-ink-subtle max-w-[58ch]">
+          <p className="mt-8 text-lg leading-[1.55] text-ink-muted max-w-[58ch]">
             Você não precisa coordenar três fornecedores diferentes. A Icardcase entrega tecnologia ponta a ponta — do código ao cabo de rede — com a mesma engenharia, o mesmo padrão de qualidade, o mesmo time.
           </p>
         </div>
@@ -89,10 +89,10 @@ export function Services() {
           {services.map((service, index) => (
             <li
               key={service.title}
-              className={`relative group bg-canvas transition-all duration-700 ease-out ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+              className={`relative group bg-canvas transition-all duration-[750ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
               }`}
-              style={{ transitionDelay: `${index * 110}ms` }}
+              style={{ transitionDelay: `${index * 90}ms` }}
             >
               <Link
                 href={service.href}

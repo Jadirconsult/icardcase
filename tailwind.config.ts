@@ -68,16 +68,16 @@ const config: Config = {
         'eyebrow': '0.05em',
       },
       fontSize: {
-        'display-xl': ['clamp(2.5rem, 6.5vw, 5rem)', { lineHeight: '1.05', letterSpacing: '-0.04em', fontWeight: '600' }],
-        'display-lg': ['clamp(2rem, 4.5vw, 3.5rem)', { lineHeight: '1.10', letterSpacing: '-0.032em', fontWeight: '600' }],
-        'display-md': ['clamp(1.75rem, 3.2vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.025em', fontWeight: '600' }],
-        'headline': ['clamp(1.5rem, 2.2vw, 1.75rem)', { lineHeight: '1.20', letterSpacing: '-0.022em', fontWeight: '600' }],
+        'display-xl': ['clamp(2.75rem, 7.5vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.045em', fontWeight: '600' }],
+        'display-lg': ['clamp(2.25rem, 5vw, 4.25rem)', { lineHeight: '1.05', letterSpacing: '-0.038em', fontWeight: '600' }],
+        'display-md': ['clamp(1.875rem, 3.4vw, 2.75rem)', { lineHeight: '1.12', letterSpacing: '-0.03em', fontWeight: '600' }],
+        'headline': ['clamp(1.5rem, 2.4vw, 1.875rem)', { lineHeight: '1.18', letterSpacing: '-0.024em', fontWeight: '600' }],
         'card-title': ['1.375rem', { lineHeight: '1.25', letterSpacing: '-0.015em', fontWeight: '500' }],
         'subhead': ['1.25rem', { lineHeight: '1.40', letterSpacing: '-0.008em', fontWeight: '400' }],
         'body-lg': ['1.125rem', { lineHeight: '1.50', letterSpacing: '-0.004em', fontWeight: '400' }],
         'eyebrow': ['0.8125rem', { lineHeight: '1.30', letterSpacing: '0.05em', fontWeight: '500' }],
-        hero: ['clamp(2.5rem, 6.5vw, 5rem)', { lineHeight: '1.05', letterSpacing: '-0.04em', fontWeight: '600' }],
-        h2: ['clamp(2rem, 4.5vw, 3.5rem)', { lineHeight: '1.10', letterSpacing: '-0.032em', fontWeight: '600' }],
+        hero: ['clamp(2.75rem, 7.5vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.045em', fontWeight: '600' }],
+        h2: ['clamp(2.25rem, 5vw, 4.25rem)', { lineHeight: '1.05', letterSpacing: '-0.038em', fontWeight: '600' }],
       },
       keyframes: {
         'fade-up': {

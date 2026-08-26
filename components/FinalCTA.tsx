@@ -49,8 +49,8 @@ export function FinalCTA() {
                 Se faz sentido pra você,
                 <span className="block text-ink-muted">faz sentido pra gente.</span>
               </h2>
-              <p className="mt-8 text-lg leading-[1.55] text-ink-subtle max-w-[48ch]">
-                Manda mensagem direto no WhatsApp. Em até <span className="text-ink-muted">4 horas úteis</span>, o próprio Jadir Luiz responde — sem bot, sem call center, sem trainee terceirizado.
+              <p className="mt-8 text-lg leading-[1.55] text-ink-muted max-w-[48ch]">
+                Manda mensagem direto no WhatsApp. Em até <span className="text-ink">4 horas úteis</span>, o próprio Jadir Luiz responde — sem bot, sem call center, sem trainee terceirizado.
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-3">

@@ -63,7 +63,7 @@ export function Differentials() {
               Engenharia de verdade,
               <span className="block text-ink-muted">não suporte de gravata.</span>
             </h2>
-            <p className="mt-8 text-lg leading-[1.55] text-ink-subtle max-w-[42ch]">
+            <p className="mt-8 text-lg leading-[1.55] text-ink-muted max-w-[42ch]">
               Quem assina o contrato é quem executa. Sem terceirização, sem júnior aprendendo no seu cliente. CEO no projeto, 14 anos no mercado.
             </p>
             <p className="mt-5 text-base leading-relaxed text-ink-subtle max-w-[42ch]">

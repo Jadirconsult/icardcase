@@ -340,8 +340,10 @@
       radial-gradient(at 80% 20%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
       radial-gradient(at 60% 80%, rgba(37, 99, 235, 0.08) 0px, transparent 50%);
   }
-  .text-display-xl { font-size: clamp(2.5rem, 6.5vw, 5rem); line-height: 1.05; letter-spacing: -0.04em; font-weight: 600; }
-  .text-display-lg { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.10; letter-spacing: -0.032em; font-weight: 600; }
-  .text-display-md { font-size: clamp(1.75rem, 3.2vw, 2.5rem); line-height: 1.15; letter-spacing: -0.025em; font-weight: 600; }
-  .text-headline { font-size: clamp(1.5rem, 2.2vw, 1.75rem); line-height: 1.20; letter-spacing: -0.022em; font-weight: 600; }
+  /* Premium/editorial: display maior e mais tight — presença de marca cara.
+     xl chega a 6.5rem (hero como protagonista), lh apertado pra bloco sólido. */
+  .text-display-xl { font-size: clamp(2.75rem, 7.5vw, 6.5rem); line-height: 1.0; letter-spacing: -0.045em; font-weight: 600; }
+  .text-display-lg { font-size: clamp(2.25rem, 5vw, 4.25rem); line-height: 1.05; letter-spacing: -0.038em; font-weight: 600; }
+  .text-display-md { font-size: clamp(1.875rem, 3.4vw, 2.75rem); line-height: 1.12; letter-spacing: -0.03em; font-weight: 600; }
+  .text-headline { font-size: clamp(1.5rem, 2.4vw, 1.875rem); line-height: 1.18; letter-spacing: -0.024em; font-weight: 600; }
 }

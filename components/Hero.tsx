@@ -55,9 +55,10 @@ export function Hero() {
         style={{ transform: `translate3d(${parallax.x * 18}px, ${parallax.y * 12}px, 0)` }}
       />
 
-      {/* grid pattern fino que fade pra fora */}
+      {/* grid pattern fino que fade pra fora — quieto (registro premium:
+          o fundo é textura, não competidor da manchete) */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.15] transition-transform duration-500 ease-out"
+        className="absolute inset-0 pointer-events-none opacity-[0.07] transition-transform duration-500 ease-out"
         aria-hidden="true"
         style={{
           backgroundImage:
@@ -72,7 +73,7 @@ export function Hero() {
       {/* constellation animada — 9 nodes + lines, lateral direita
           opacidade reduzida (auditoria A3: hero estava competindo por retina) */}
       <div
-        className="absolute -right-12 top-1/2 -translate-y-1/2 h-[120%] w-[55%] pointer-events-none mix-blend-screen hidden md:block transition-transform duration-500 ease-out opacity-60"
+        className="absolute -right-12 top-1/2 -translate-y-1/2 h-[120%] w-[55%] pointer-events-none mix-blend-screen hidden md:block transition-transform duration-500 ease-out opacity-[0.3]"
         aria-hidden="true"
         style={{ transform: `translate3d(${parallax.x * -24}px, ${parallax.y * -12 - 50}%, 0)` }}
       >
@@ -184,7 +185,7 @@ export function Hero() {
             15-25 palavras). Tom institucional 'nós' em vez do 'eu' pra manter
             coerência com o resto do site. */}
         <p
-          className={`mt-8 max-w-[52ch] text-lg leading-[1.5] text-ink-subtle sm:text-xl transition-all duration-500 ease-out ${
+          className={`mt-10 max-w-[46ch] text-xl leading-[1.5] text-ink-muted sm:text-2xl transition-all duration-500 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
           style={{ transitionDelay: '240ms' }}

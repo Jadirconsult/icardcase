@@ -22,6 +22,35 @@
     @apply bg-accent text-white;
   }
 
+  /* Superfícies do browser tematizadas pela paleta (scrollbar + caret).
+     Sem isto, a barra de rolagem e o cursor de texto chegam com o cinza
+     padrão do SO, que não pertence a nenhum design system. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.hairline-strong') theme('colors.canvas');
+  }
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-canvas;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-lg bg-hairline;
+    border: 3px solid theme('colors.canvas');
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-hairline-strong;
+  }
+  ::-webkit-scrollbar-corner {
+    @apply bg-canvas;
+  }
+  input,
+  textarea {
+    @apply caret-accent;
+  }
+
   /* Respeita usuários com prefers-reduced-motion (WCAG 2.3.3):
      neutraliza animações infinitas, transições e scroll suave. */
   @media (prefers-reduced-motion: reduce) {
@@ -289,7 +318,14 @@
     @apply font-semibold text-ink;
   }
   .prose-icardcase blockquote {
-    @apply border-l-2 border-accent pl-5 italic text-ink-subtle my-8;
+    @apply relative my-8 rounded-lg bg-surface-1/60 py-5 pl-12 pr-6 not-italic text-ink-muted;
+  }
+  .prose-icardcase blockquote::before {
+    content: '\201C';
+    @apply absolute left-4 top-3 font-mono text-4xl leading-none text-accent/70;
+  }
+  .prose-icardcase blockquote p:last-child {
+    @apply mb-0;
   }
   .prose-icardcase code {
     @apply bg-surface-2 text-accent px-1.5 py-0.5 rounded text-sm font-mono;

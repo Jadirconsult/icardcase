@@ -76,7 +76,9 @@ export function AnimatedCounter({
       : Math.round(current).toString()
 
   return (
-    <span ref={ref} className={className}>
+    // tabular-nums: dígitos de largura fixa — sem isto o número "pula" de
+    // largura a cada frame durante a contagem (micro-layout-shift).
+    <span ref={ref} className={`tabular-nums ${className ?? ''}`}>
       {prefix}
       {formatted}
       {suffix}

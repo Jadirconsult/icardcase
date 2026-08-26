@@ -54,6 +54,10 @@ const config: Config = {
       },
       maxWidth: {
         content: '1280px',
+        // Medida de leitura para conteúdo long-form (artigos, cases, headers
+        // editoriais). ~72ch no corpo de 18px — dentro do piso 65–75ch.
+        // Antes indefinida: o texto renderizava a 1280px (~130ch, ilegível).
+        'prose-wide': '42rem',
       },
       letterSpacing: {
         'tracking-display-xl': '-0.04em',

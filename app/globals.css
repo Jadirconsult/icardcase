@@ -13,8 +13,11 @@
     @apply bg-canvas text-ink antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01', 'ss03';
   }
+  /* Anel de foco: antes era rgba(37,99,235,0.55), que compunha para #16305F
+     sobre o canvas — 1.93:1, abaixo dos 3:1 que a WCAG 1.4.11 exige de
+     indicador nao-textual. Azul claro solido resolve (7.4:1) sem alpha. */
   *:focus-visible {
-    outline: 2px solid rgba(37, 99, 235, 0.55);
+    outline: 2px solid #7CA8FF;
     outline-offset: 3px;
     border-radius: 3px;
   }
@@ -118,6 +121,14 @@
   }
   .btn-primary:hover {
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 4px 24px -8px rgba(37, 99, 235, 0.5);
+  }
+  /* O @apply acima termina em focus-visible:outline-none e nao repunha nada:
+     o CTA de conversao de cada pagina ficava invisivel para teclado.
+     Branco (17:1 sobre canvas, 5.2:1 sobre o proprio azul) vale em qualquer
+     superficie do ladder, ao contrario de um ring que precisa de offset-color. */
+  .btn-primary:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 2px;
   }
 
   .btn-secondary {
@@ -340,10 +351,19 @@
       radial-gradient(at 80% 20%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
       radial-gradient(at 60% 80%, rgba(37, 99, 235, 0.08) 0px, transparent 50%);
   }
-  /* Premium/editorial: display maior e mais tight — presença de marca cara.
-     xl chega a 6.5rem (hero como protagonista), lh apertado pra bloco sólido. */
-  .text-display-xl { font-size: clamp(2.75rem, 7.5vw, 6.5rem); line-height: 1.0; letter-spacing: -0.045em; font-weight: 600; }
-  .text-display-lg { font-size: clamp(2.25rem, 5vw, 4.25rem); line-height: 1.05; letter-spacing: -0.038em; font-weight: 600; }
-  .text-display-md { font-size: clamp(1.875rem, 3.4vw, 2.75rem); line-height: 1.12; letter-spacing: -0.03em; font-weight: 600; }
-  .text-headline { font-size: clamp(1.5rem, 2.4vw, 1.875rem); line-height: 1.18; letter-spacing: -0.024em; font-weight: 600; }
+  /* A escala display vive só no fontSize do tailwind.config.ts. Estas quatro
+     classes estavam redeclaradas aqui com os mesmos valores — duas fontes de
+     verdade para a mesma classe, e a próxima alteração perderia em silêncio
+     de um dos lados dependendo da ordem da cascata.
+
+     O que sobra aqui é o failsafe de quebra: com o piso do display-xl em
+     3.25rem, palavras longas do pt-BR ("transformam.", "infraestrutura")
+     passam da coluna útil de um telefone de 320px. Sem isto, a página inteira
+     ganha scroll horizontal; com isto, a palavra quebra só quando não couber. */
+  .text-display-xl,
+  .text-display-lg,
+  .text-display-md,
+  .text-headline {
+    overflow-wrap: break-word;
+  }
 }

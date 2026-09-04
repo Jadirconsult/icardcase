@@ -68,7 +68,13 @@ const config: Config = {
         'eyebrow': '0.05em',
       },
       fontSize: {
-        'display-xl': ['clamp(2.75rem, 7.5vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.045em', fontWeight: '600' }],
+        // Piso subido de 2.75rem para 3.25rem: o termo fluido 7.5vw so alcancava
+        // o piso antigo a 587px, entao TODO telefone renderizava a 44px e o
+        // upgrade display de 6.5rem era ganho exclusivo de desktop. A 375px a
+        // hierarquia h1/h2 era 1.22x contra 1.53x no desktop — comprimida
+        // justamente onde tudo esta empilhado e so ela orienta a leitura.
+        // 9vw (nao 12vw) para nao transformar o desktop de tabela junto.
+        'display-xl': ['clamp(3.25rem, 9vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.045em', fontWeight: '600' }],
         'display-lg': ['clamp(2.25rem, 5vw, 4.25rem)', { lineHeight: '1.05', letterSpacing: '-0.038em', fontWeight: '600' }],
         'display-md': ['clamp(1.875rem, 3.4vw, 2.75rem)', { lineHeight: '1.12', letterSpacing: '-0.03em', fontWeight: '600' }],
         'headline': ['clamp(1.5rem, 2.4vw, 1.875rem)', { lineHeight: '1.18', letterSpacing: '-0.024em', fontWeight: '600' }],

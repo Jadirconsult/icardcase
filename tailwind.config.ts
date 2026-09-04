@@ -36,6 +36,10 @@ const config: Config = {
           DEFAULT: '#2563EB',        // CTA primary
           hover: '#3B82F6',          // hover (mais claro)
           focus: '#1D4FD8',          // focus ring
+          // Para TEXTO. 7.55:1 no canvas, 6.29 no surface-1, 5.65 no
+          // surface-2 — passa nas tres. Use accent para preenchimento,
+          // accent-text para tipografia e icone sobre fundo escuro.
+          text: '#60A5FA',
         },
 
         // ─── Backward-compat tokens (usados pelos componentes existentes) ─

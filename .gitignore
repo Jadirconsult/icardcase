@@ -44,3 +44,6 @@ lighthouse-*.html
 psi-*.json
 
 .vercel
+
+# Saida local do skill Impeccable (snapshot de critique + cache do hook)
+.impeccable/

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 const risks = [
@@ -105,8 +104,8 @@ export function DataUnification() {
           </p>
 
           <div className="mt-10">
-            <Link href="/seguranca-lgpd" className="btn-primary group">
-              Ver como aplicamos isso
+            <a href="#diagnostico" className="btn-primary group">
+              Medir minha exposição agora
               <svg
                 width="14"
                 height="14"
@@ -119,7 +118,7 @@ export function DataUnification() {
               >
                 <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

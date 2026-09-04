@@ -10,11 +10,11 @@ export default function PoliticaPrivacidadePage() {
   const updatedAt = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
 
   return (
-    <div className="bg-white py-16 md:py-20">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <p className="text-xs font-medium tracking-wide-2 uppercase text-accent mb-3">Documento legal</p>
-        <h1 className="text-3xl md:text-4xl font-semibold text-ink leading-tight mb-3">Política de Privacidade</h1>
-        <p className="text-muted mb-12">Última atualização: {updatedAt}</p>
+    <section className="section-y">
+      <div className="container-content max-w-prose-wide">
+        <p className="section-kicker">DOCUMENTO LEGAL</p>
+        <h1 className="mt-2 text-display-lg text-ink">Política de Privacidade</h1>
+        <p className="mt-4 mb-12 text-ink-subtle">Última atualização: {updatedAt}</p>
 
         <div className="prose-icardcase">
           <p>
@@ -117,6 +117,6 @@ export default function PoliticaPrivacidadePage() {
           </p>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

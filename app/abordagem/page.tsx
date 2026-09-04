@@ -10,21 +10,21 @@ export const metadata: Metadata = {
 
 export default function AbordagemPage() {
   return (
-    <div className="bg-white">
-      <section className="bg-ink text-white py-16 md:py-20">
-        <div className="mx-auto max-w-content px-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-medium tracking-wide-2 uppercase text-accent mb-3">Como trabalhamos</p>
-          <h1 className="text-3xl md:text-5xl font-semibold leading-tight mb-4 max-w-3xl">
+    <>
+      <section className="section-y pb-0">
+        <div className="container-content max-w-prose-wide">
+          <p className="section-kicker">COMO TRABALHAMOS</p>
+          <h1 className="mt-2 text-display-lg text-ink">
             Engenharia, não suporte.
           </h1>
-          <p className="text-lg text-white/80 max-w-2xl leading-relaxed">
+          <p className="mt-6 text-body-lg leading-[1.55] text-ink-muted">
             Cada uma das nossas cinco frentes segue um método. Aqui você entende como.
           </p>
         </div>
       </section>
 
-      <section className="py-16 md:py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <section className="section-y">
+        <div className="container-content max-w-prose-wide">
           <div className="prose-icardcase">
             <h2 id="desenvolvimento">Desenvolvimento de sistemas</h2>
             <p>
@@ -67,10 +67,10 @@ export default function AbordagemPage() {
             </p>
           </div>
 
-          <div className="mt-12 p-6 bg-surface-alt rounded-lg flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="surface-card mt-12 flex flex-col gap-4 p-7 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <p className="font-medium text-ink mb-1">Tem um projeto em mente?</p>
-              <p className="text-sm text-muted">Conversamos sobre como aplicar essa abordagem.</p>
+              <p className="font-medium text-ink">Tem um projeto em mente?</p>
+              <p className="mt-1 text-sm text-ink-subtle">Conversamos sobre como aplicar essa abordagem.</p>
             </div>
             <WhatsAppButton origem="abordagem_cta" variant="primary">
               Falar conosco
@@ -78,6 +78,6 @@ export default function AbordagemPage() {
           </div>
         </div>
       </section>
-    </div>
+    </>
   )
 }

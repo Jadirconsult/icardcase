@@ -15,9 +15,15 @@ const routes = [
   { url: '/consultoria-ti', priority: 0.9, changeFrequency: 'monthly' as const },
   // Landing de oferta — campanha de captação (contabilidades)
   { url: '/raio-x-de-ti', priority: 0.8, changeFrequency: 'monthly' as const },
-  { url: '/politica-de-privacidade', priority: 0.3, changeFrequency: 'yearly' as const },
-  { url: '/termos-de-uso', priority: 0.3, changeFrequency: 'yearly' as const },
-  { url: '/lgpd', priority: 0.3, changeFrequency: 'yearly' as const },
+  // Landing de topo de funil — busca orgânica por "Shadow IT", com o
+  // diagnóstico por conversa no lugar do formulário.
+  { url: '/shadow-it', priority: 0.9, changeFrequency: 'monthly' as const },
+  // Auditoria 09/2026: as três entradas legais aqui apontavam para 404.
+  // A rota real é /politica-privacidade (sem o "de"); /termos-de-uso e /lgpd
+  // nunca existiram em app/. Declarar 404 no sitemap gasta orçamento de
+  // rastreio e deixava a política real fora do índice.
+  { url: '/politica-privacidade', priority: 0.3, changeFrequency: 'yearly' as const },
+  { url: '/abordagem', priority: 0.6, changeFrequency: 'monthly' as const },
 ]
 
 const blogPosts = [

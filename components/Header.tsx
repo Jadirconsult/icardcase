@@ -114,12 +114,25 @@ export function Header() {
                 </Link>
               </li>
             ))}
-            <li className="pt-3">
+            {/* /contato so existia no bloco `hidden lg:flex` acima: no celular
+                o formulario — caminho de conversao de peso igual ao WhatsApp —
+                nao existia na navegacao, e so era alcancavel rolando ate o
+                rodape. Aqui ele leva o primario porque o WhatsApp ja aparece
+                em outros cinco pontos da home mais o botao flutuante; quem
+                prefere resposta imediata continua a um toque de distancia. */}
+            <li className="space-y-2 pt-4">
+              <Link
+                href="/contato"
+                onClick={() => setMobileOpen(false)}
+                className="btn-primary w-full"
+              >
+                Falar com a Icardcase
+              </Link>
               <a
                 href={buildWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary w-full"
+                className="btn-secondary w-full"
               >
                 Conversar no WhatsApp
               </a>

@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation'
  *
  * Para criar nova landing isolada, basta adicionar o prefixo aqui.
  */
-const CHROMELESS_PREFIXES = ['/raio-x-de-ti']
+const CHROMELESS_PREFIXES = ['/raio-x-de-ti', '/shadow-it']
 
 export function ConditionalChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

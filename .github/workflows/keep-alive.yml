@@ -1,0 +1,97 @@
+# Segundo pinger do keep-alive do Supabase — redundância fora da Vercel.
+#
+# Por que existe: o cron da Vercel é o único mecanismo que impede o projeto
+# Supabase Free de pausar por inatividade. Se ele parar de disparar (plano
+# Hobby é best-effort, um deploy pode removê-lo, a conta pode ser suspensa), o
+# projeto pausa em 7 dias e TODO lead do site passa a se perder, porque
+# /api/lead responde 500 sem banco do outro lado.
+#
+# Este workflow roda em infraestrutura diferente. Para o keep-alive falhar
+# agora, Vercel e GitHub Actions têm de falhar juntos.
+#
+# Horário deslocado de propósito: a Vercel dispara às 12h UTC, este às 00h.
+# Assim há duas janelas por dia, com ~12h de distância.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# CONFIGURAÇÃO (uma vez, no GitHub):
+#   Settings > Secrets and variables > Actions > New repository secret
+#     CRON_SECRET  — o MESMO valor que está na Vercel
+#     SITE_URL     — https://www.icardcase.com.br  (opcional; há default)
+#
+# ⚠️ LIMITAÇÃO CONHECIDA DO GITHUB
+#   Workflows agendados são DESATIVADOS automaticamente após 60 dias sem
+#   nenhum commit no repositório. Se o repo ficar dois meses parado, esta
+#   rede de proteção cai em silêncio — e aí sobra só o cron da Vercel.
+#   O GitHub avisa por e-mail antes de desativar.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Keep-alive Supabase
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: # permite disparo manual pela aba Actions
+
+# Sem permissão de escrita: este job só faz uma requisição HTTP de saída.
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pingar /api/cron/keep-alive
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL || 'https://www.icardcase.com.br' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET não está definido nos Secrets do repositório."
+            echo "Sem ele a rota responde 401 e este workflow não protege nada."
+            exit 1
+          fi
+
+          # --max-time evita job pendurado se a serverless não responder.
+          # O corpo vai para stdout; o código HTTP é capturado à parte.
+          código=$(curl -sS \
+            -o resposta.json \
+            -w '%{http_code}' \
+            --max-time 30 \
+            --retry 2 \
+            --retry-delay 10 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${SITE_URL}/api/cron/keep-alive")
+
+          echo "HTTP ${código}"
+          cat resposta.json || true
+          echo
+
+          case "${código}" in
+            200)
+              echo "Keep-alive OK — Supabase recebeu atividade."
+              ;;
+            401)
+              echo "::error::401 — o CRON_SECRET deste repositório não bate com o da Vercel."
+              exit 1
+              ;;
+            503)
+              echo "::error::503 — CRON_SECRET ausente na Vercel; a rota está fail-closed."
+              exit 1
+              ;;
+            500)
+              echo "::error::500 — a rota respondeu mas o Supabase falhou."
+              echo "Verifique se o projeto está pausado ou se a conta excedeu o limite de projetos free."
+              exit 1
+              ;;
+            *)
+              echo "::error::Resposta inesperada (${código}). O site pode estar fora do ar."
+              exit 1
+              ;;
+          esac

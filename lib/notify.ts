@@ -197,3 +197,41 @@ export async function notifyLeadViaEmail(lead: LeadNotification): Promise<void> 
     console.error('[Lead] Falha SMTP:', err)
   }
 }
+
+
+/**
+ * Alerta operacional — falha de infraestrutura que ninguém veria sozinho.
+ *
+ * O keep-alive do Supabase falhava em silêncio: a rota logava o erro no
+ * console da Vercel e retornava 500 para um cron que ninguém lê. O projeto
+ * pausava dias depois, e a primeira evidência era lead deixando de chegar.
+ *
+ * Diferente de notifyLeadViaEmail, aqui a falha de envio NÃO é aceitável em
+ * silêncio — mas também não pode derrubar a rota que a chamou. Loga e segue.
+ */
+export async function notifyOpsAlert(assunto: string, corpo: string): Promise<void> {
+  const transporter = getTransporter()
+  if (!transporter) {
+    console.error('[Ops] ALERTA NÃO ENVIADO (SMTP ausente):', assunto)
+    return
+  }
+
+  const to = process.env.LEAD_NOTIFICATION_EMAIL
+  const from = process.env.LEAD_NOTIFICATION_FROM || process.env.SMTP_USER
+  if (!to || !from) {
+    console.error('[Ops] ALERTA NÃO ENVIADO (destinatário ausente):', assunto)
+    return
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"Icardcase — Alerta" <${from}>`,
+      to,
+      subject: sanitizeHeader(`[ALERTA] ${assunto}`),
+      text: corpo,
+    })
+    console.log('[Ops] Alerta enviado:', assunto)
+  } catch (err) {
+    console.error('[Ops] Falha ao enviar alerta:', err)
+  }
+}

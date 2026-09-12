@@ -8,7 +8,7 @@ Todos ficam em `components/`, em **PascalCase.tsx**, **named export**, um por ar
 ## Índice
 | Componente | Categoria | Uma linha | Client? |
 |---|---|---|---|
-| `Logo` | UI | Logo SVG inline (ícone + "icardcase") | não |
+| `Logo` | UI | Logo oficial em PNG transparente + "icardcase" | não |
 | `AnimatedCounter` | UI | Número que conta até o valor ao entrar na viewport | sim |
 | `WhatsAppButton` | UI | Botão/float de WhatsApp com telemetria de clique | sim |
 | `ConditionalChrome` | Layout | Oculta Header/Footer em landings pagas | sim |
@@ -33,14 +33,14 @@ Todos ficam em `components/`, em **PascalCase.tsx**, **named export**, um por ar
 ---
 
 ## Logo
-**Objetivo:** marca da Icardcase — SVG inline (o "i" estilizado + circuito de 3 nós) com texto opcional.
+**Objetivo:** marca da Icardcase — logo oficial (o "i" azul + circuito de 5 nós) em `public/logo-icardcase-mark.png`, fundo transparente, com texto opcional. A versão quadrada com fundo creme fica em `public/logo-icardcase.png` (ícones, JSON-LD).
 **Arquivo:** [components/Logo.tsx](components/Logo.tsx)
 **Quando utilizar:** header, footer, topo de landing, 404.
 **Quando NÃO utilizar:** como favicon (use os assets de `public/`).
 **Props:**
 | Prop | Tipo | Obrigatória | Default | Descrição |
 |---|---|---|---|---|
-| `variant` | `'light' \| 'dark'` | não | `'light'` | Cor do texto/ícone. Use `'dark'` sobre o fundo navy do site |
+| `variant` | `'light' \| 'dark'` | não | `'light'` | Cor do texto (o ícone é sempre o azul oficial). Use `'dark'` sobre o fundo navy do site |
 | `showText` | `boolean` | não | `true` | Mostra a palavra "icardcase" ao lado do ícone |
 | `className` | `string` | não | — | Classes extras no wrapper |
 ```tsx

@@ -528,7 +528,7 @@ export default async function PostPage({ params }: PageProps) {
       '@type': 'Organization',
       name: 'Icardcase',
       url: SITE.url,
-      logo: { '@type': 'ImageObject', url: `${SITE.url}/icon.svg` },
+      logo: { '@type': 'ImageObject', url: `${SITE.url}/android-chrome-512x512.png`, width: 512, height: 512 },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     articleSection: post.category,

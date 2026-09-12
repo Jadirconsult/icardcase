@@ -102,7 +102,7 @@ const nextConfig = {
       // Páginas públicas (home, sobre, cases, insights, contato) — cache CDN agressivo
       { source: '/((?!api|_next).*)', headers: publicCacheHeaders },
       // Assets estáticos (favicon, ícones, OG) — cache muito longo
-      { source: '/(favicon|icon|apple-touch|android-chrome|og-default|logo-mark).:ext*', headers: staticAssetCacheHeaders },
+      { source: '/(favicon|icon|apple-touch|android-chrome|og-default|og-icardcase|logo-mark).:ext*', headers: staticAssetCacheHeaders },
       { source: '/site.webmanifest', headers: staticAssetCacheHeaders },
     ]
   },

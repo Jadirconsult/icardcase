@@ -31,8 +31,8 @@ const routes: RouteEntry[] = [
   { url: '/insights', priority: 0.9, changeFrequency: 'weekly', lastModified: latest('2026-07-01', newestPost) },
   { url: '/contato', priority: 0.7, changeFrequency: 'monthly', lastModified: '2026-06-30' },
   // Páginas de serviço — SEO orgânico nacional
-  { url: '/desenvolvimento-de-sistemas', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-30' },
-  { url: '/desenvolvimento-mobile', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-30' },
+  { url: '/desenvolvimento-de-sistemas', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-09-12' },
+  { url: '/desenvolvimento-mobile', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-09-12' },
   { url: '/infraestrutura-de-ti', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-30' },
   { url: '/seguranca-lgpd', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-30' },
   { url: '/consultoria-ti', priority: 0.9, changeFrequency: 'monthly', lastModified: '2026-06-30' },

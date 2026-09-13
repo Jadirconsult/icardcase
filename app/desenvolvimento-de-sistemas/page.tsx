@@ -35,6 +35,10 @@ const faq = [
     a: `Três coisas. Primeiro: quem fecha contigo executa. Não tem trainee aprendendo no seu projeto, não tem freelancer terceirizado. Segundo: ${yearsInBusiness()} anos de mercado e 15 anos prévios em infraestrutura crítica (Vale, Camargo Corrêa, EFVM) — sabemos o que é prazo apertado e sistema de missão crítica. Terceiro: ticket alto, poucos clientes por ano — cada projeto tem atenção real, não está numa fila de 50 contas paralelas.`,
   },
   {
+    q: 'Qual a diferença entre site, sistema web e web app?',
+    a: 'Site apresenta a empresa e capta contatos. Sistema web é o software que roda a operação no navegador: cadastros, estoque, financeiro, emissão fiscal, com login e permissão por usuário. Web app é um sistema web pensado para uso diário e rápido, que funciona bem no celular e pode ser instalado na tela inicial sem passar pelas lojas. Quando a equipe depende de câmera, uso offline intenso ou notificações nativas, o caminho costuma ser um aplicativo mobile.',
+  },
+  {
     q: 'Vocês desenvolvem aplicativo mobile também?',
     a: 'Sim. Stack React Native / Expo, publicação em App Store e Google Play, integração com sistemas backend que você já tem.',
     // Link interno renderizado após a resposta (antes a rota aparecia só como texto)
@@ -146,8 +150,8 @@ export default function DesenvolvimentoDeSistemasPage() {
                 body: 'NF-e, NFC-e, NFS-e nacional, SPED, DCTFWeb, integração com TOTVS / Sankhya / Domínio. Construímos a camada de integração que respeita o ritmo da SEFAZ e o seu fluxo interno.',
               },
               {
-                title: 'A reforma tributária 2026 está chegando',
-                body: 'IBS e CBS entram em janeiro de 2026 com novos campos na nota fiscal, alíquotas por município, regime dual de cálculo. Sistemas legados vão precisar reescrever — ou ser substituídos. Quanto antes começar, melhor.',
+                title: 'A reforma tributária já começou',
+                body: 'Desde janeiro de 2026, IBS e CBS aparecem na nota fiscal em fase de teste, e a transição segue até 2033 com regime dual de cálculo. Sistema legado que não acompanhar vai precisar ser reescrito ou substituído. Quanto antes começar, menos retrabalho.',
               },
             ].map((scenario) => (
               <li key={scenario.title} className="bg-canvas p-7">

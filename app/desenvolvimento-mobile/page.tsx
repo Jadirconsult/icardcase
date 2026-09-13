@@ -19,8 +19,12 @@ const faq = [
     a: 'Pela economia. React Native (com Expo) entrega um único código rodando em iOS e Android com performance próxima do nativo, em metade do tempo e custo. Para 90% dos apps empresariais (dashboards, formulários, integração com backend), é a escolha certa. Reservamos nativo puro para casos específicos: AR, processamento de vídeo em tempo real, integração com hardware proprietário.',
   },
   {
+    q: 'App nativo ou web app: qual escolher?',
+    a: 'Web app roda no navegador, pode ser instalado na tela inicial e é atualizado sem passar pelas lojas, o que barateia a manutenção. App nativo (React Native com Expo) faz sentido quando o uso depende de câmera, leitor de QR code, notificação push confiável, trabalho offline em campo ou presença na App Store e no Google Play. No diagnóstico indicamos o formato certo para o seu caso, e muitos projetos começam como web app e ganham o aplicativo depois.',
+  },
+  {
     q: 'Vocês publicam o app na App Store e Google Play?',
-    a: 'Sim. Cuidamos do processo completo: ícone, screenshots, descrição, formulários de privacidade, certificados de assinatura, revisão da Apple e Google. Você precisa apenas das contas de developer (R$ 99/ano Apple, US$ 25 Google — taxas próprias da plataforma) em nome da sua empresa.',
+    a: 'Sim. Cuidamos do processo completo: ícone, screenshots, descrição, formulários de privacidade, certificados de assinatura, revisão da Apple e Google. Você precisa apenas das contas de desenvolvedor em nome da sua empresa (US$ 99 por ano na Apple e US$ 25 em pagamento único no Google — taxas das próprias plataformas).',
   },
   {
     q: 'O app precisa de internet pra funcionar?',
@@ -32,7 +36,7 @@ const faq = [
   },
   {
     q: 'Quanto custa manter um app mobile depois de pronto?',
-    a: 'Três custos. (1) Contas de developer: R$ 600/ano Apple + R$ 130 Google (única). (2) Servidor/banco: variável conforme tráfego, geralmente R$ 200-2.000/mês. (3) Manutenção evolutiva: depende do contrato — sugerimos pacote mensal cobrindo atualizações do iOS/Android (a Apple e Google quebram coisas a cada ~12 meses) + ajustes evolutivos.',
+    a: 'Três custos. (1) Contas de desenvolvedor: US$ 99 por ano na Apple e US$ 25 uma única vez no Google. (2) Servidor/banco: variável conforme tráfego, geralmente R$ 200-2.000/mês. (3) Manutenção evolutiva: depende do contrato — sugerimos pacote mensal cobrindo atualizações do iOS/Android (a Apple e Google quebram coisas a cada ~12 meses) + ajustes evolutivos.',
   },
   {
     q: 'O app vai funcionar em tablet também?',

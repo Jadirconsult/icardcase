@@ -1,0 +1,39 @@
+-- ============================================================================
+-- Icardcase Site — Hardening 2026-09
+-- ============================================================================
+-- Rodar À MÃO no SQL Editor do Supabase (produção). Idempotente: pode rodar 2x.
+--
+-- ATENÇÃO: rode TAMBÉM o supabase/hardening-rpc.sql, que ainda está PENDENTE
+-- em produção (revoga EXECUTE de anon nas funções SECURITY DEFINER
+-- get_leads_stats e increment_no_pause). Sem ele, a anon key lê as métricas
+-- de leads via /rest/v1/rpc. A ordem entre os dois arquivos não importa.
+--
+-- PROBLEMA
+-- --------
+-- public.set_updated_at() (supabase/schema.sql) foi criada sem `search_path`
+-- fixo. Função com search_path mutável resolve nomes não qualificados pelo
+-- search_path de quem chama — quem conseguir criar objeto num schema que venha
+-- antes pode sequestrar a resolução. O Security Advisor do Supabase acusa como
+-- `function_search_path_mutable`.
+--
+-- SOLUÇÃO
+-- -------
+-- search_path vazio. O corpo só usa `now()`, que mora em pg_catalog — schema
+-- sempre pesquisado implicitamente, mesmo com search_path = ''. Nada quebra.
+-- (log_lead_changes e get_leads_stats já fixam search_path = public.)
+-- ============================================================================
+
+alter function public.set_updated_at() set search_path = '';
+
+-- ============================================================================
+-- VERIFICAÇÃO — deve mostrar {search_path=""} na coluna proconfig
+-- ============================================================================
+-- select p.proname, p.proconfig
+-- from pg_proc p
+-- join pg_namespace n on n.oid = p.pronamespace
+-- where n.nspname = 'public'
+--   and p.proname = 'set_updated_at';
+--
+-- Teste funcional: um UPDATE em public.leads deve continuar atualizando
+-- updated_at normalmente.
+-- ============================================================================

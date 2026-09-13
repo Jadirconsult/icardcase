@@ -7,13 +7,28 @@ const isDev = process.env.NODE_ENV !== 'production'
  * - dev: precisa 'unsafe-eval' (HMR/React DevTools) e 'unsafe-inline' (fast refresh)
  * - prod: sem 'unsafe-eval'. 'unsafe-inline' ainda em script-src pelo
  *   inline JSON-LD do layout.tsx (Schema.org) — migrar pra nonces depois.
+ *
+ * Terceiros: só a tag do Google Ads (components/GoogleTag.tsx), com hosts
+ * EXATOS. Nunca `https:` genérico nem `*.google.com` — isso liberaria script
+ * de qualquer serviço hospedado no domínio. Não há Google Analytics instalado
+ * e o Supabase é só server-side (route handlers), então nenhum dos dois entra.
  */
 const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
   ...(isDev ? ["'unsafe-eval'"] : []),
   'https://www.googletagmanager.com',
-  'https://www.google-analytics.com',
+  'https://www.googleadservices.com',
+  'https://googleads.g.doubleclick.net',
+].join(' ')
+
+// Beacons de conversão do Ads (gtag faz fetch/sendBeacon pra estes hosts).
+const connectSrc = [
+  "'self'",
+  'https://www.google.com',
+  'https://www.googleadservices.com',
+  'https://ad.doubleclick.net',
+  'https://googleads.g.doubleclick.net',
 ].join(' ')
 
 const securityHeaders = [
@@ -23,6 +38,10 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
+  // Isola o browsing context: página aberta via window.open por outro site não
+  // ganha referência a esta (anti tabnabbing / XS-Leaks). Links wa.me abertos
+  // daqui continuam funcionando — só perdem window.opener, que não usamos.
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
   {
     key: 'Content-Security-Policy',
     value: [
@@ -31,7 +50,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com",
+      `connect-src ${connectSrc}`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -50,8 +69,8 @@ const securityHeaders = [
  *
  * A API é same-origin: site e rotas moram no mesmo domínio, então não é preciso
  * conceder CORS a ninguém. Ficam só os headers que NÃO concedem acesso.
- * A allowlist de verdade é validada em runtime dentro da rota — ver
- * isAllowedOrigin() em app/api/whatsapp-click/route.ts.
+ * A allowlist de verdade é validada em runtime dentro das rotas POST — ver
+ * isAllowedOrigin() em lib/origin.ts.
  */
 const apiCorsHeaders = [
   { key: 'Access-Control-Allow-Methods', value: 'POST, OPTIONS' },
@@ -78,12 +97,40 @@ const apiNoCacheHeaders = [
   { key: 'Cache-Control', value: 'no-store, max-age=0' },
 ]
 
-// Assets versionados (favicon, og, manifest) — cache longo
+/**
+ * Assets de public/ (ícones, logos, OG, manifest) — cache de 1 dia, SEM
+ * `immutable`. Nenhum deles tem hash no nome: foram todos regenerados no mesmo
+ * nome (commits 45ff848 e c2c0799). Com `immutable` + max-age longo, quem já
+ * visitou ficaria com o ícone/logo antigo no browser sem revalidar.
+ */
 const staticAssetCacheHeaders = [
   {
     key: 'Cache-Control',
-    value: 'public, max-age=86400, s-maxage=604800, immutable',
+    value: 'public, max-age=86400, s-maxage=86400',
   },
+]
+
+/**
+ * Lista explícita de arquivos (path-to-regexp: `/:param(regex)`, com `\\.`
+ * para o ponto literal). O padrão antigo `/(favicon|...).:ext*` não casava com
+ * nomes que têm hífen depois do prefixo (apple-touch-icon.png,
+ * android-chrome-512x512.png) nem com logo-icardcase*.png / icardinho.png.
+ * Arquivo novo em public/ que deva ter esse cache: adicionar aqui.
+ */
+const STATIC_ASSET_FILES = [
+  'favicon\\.ico',
+  'favicon-16x16\\.png',
+  'favicon-32x32\\.png',
+  'apple-touch-icon\\.png',
+  'android-chrome-192x192\\.png',
+  'android-chrome-512x512\\.png',
+  'og-default\\.png',
+  'og-default\\.svg',
+  'og-icardcase\\.png',
+  'logo-icardcase\\.png',
+  'logo-icardcase-mark\\.png',
+  'icardinho\\.png',
+  'site\\.webmanifest',
 ]
 
 const nextConfig = {
@@ -91,8 +138,9 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   images: {
+    // Sem remotePatterns: toda imagem é local (public/). Liberar host remoto
+    // no otimizador só amplia superfície (proxy de imagem de terceiro).
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
   },
   async headers() {
     return [
@@ -101,9 +149,9 @@ const nextConfig = {
       { source: '/api/:path*', headers: apiNoCacheHeaders },
       // Páginas públicas (home, sobre, cases, insights, contato) — cache CDN agressivo
       { source: '/((?!api|_next).*)', headers: publicCacheHeaders },
-      // Assets estáticos (favicon, ícones, OG) — cache muito longo
-      { source: '/(favicon|icon|apple-touch|android-chrome|og-default|og-icardcase|logo-mark).:ext*', headers: staticAssetCacheHeaders },
-      { source: '/site.webmanifest', headers: staticAssetCacheHeaders },
+      // Assets de public/ — DEPOIS da regra de páginas: no Next, com a mesma
+      // chave de header, a última regra que casa vence.
+      { source: `/:file(${STATIC_ASSET_FILES.join('|')})`, headers: staticAssetCacheHeaders },
     ]
   },
   // www → apex agora é responsabilidade do painel Vercel (Domains → Redirect to).

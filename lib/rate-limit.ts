@@ -21,7 +21,9 @@ export const leadFormRateLimit = redis
   ? new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(3, '1 h'),
-      analytics: true,
+      // analytics: false — com true o Upstash guarda identificador (IP cheio)
+      // por request no dashboard dele. LGPD: não mandar IP pra terceiro à toa.
+      analytics: false,
       prefix: 'rl:lead',
     })
   : null
@@ -30,7 +32,7 @@ export const whatsappClickRateLimit = redis
   ? new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(10, '1 m'),
-      analytics: true,
+      analytics: false,
       prefix: 'rl:wa',
     })
   : null
@@ -52,6 +54,30 @@ export async function checkRateLimit(
   }
   const { success, remaining, reset } = await ratelimiter.limit(identifier)
   return { allowed: success, remaining, reset }
+}
+
+/**
+ * Trava "uma vez por janela" compartilhada entre instâncias (Redis SET NX EX).
+ * Retorna true só para o PRIMEIRO chamador da janela.
+ *
+ * Uso: limitar alerta por e-mail disparável por request anônimo (ex.: o
+ * keep-alive sem CRON_SECRET), pra ninguém inundar a caixa batendo na rota.
+ *
+ * Sem Redis ou com Redis falhando → false. Memória local não serve: cada
+ * instância serverless teria o próprio contador. Na dúvida, não envia.
+ */
+export async function claimOncePerWindow(key: string, windowSeconds: number): Promise<boolean> {
+  if (!redis) return false
+  try {
+    const result = await redis.set(key, '1', { nx: true, ex: windowSeconds })
+    return result === 'OK'
+  } catch (err) {
+    console.error('[CRÍTICO] Redis indisponível ao reservar janela:', {
+      key,
+      err: err instanceof Error ? err.message : 'unknown',
+    })
+    return false
+  }
 }
 
 /**

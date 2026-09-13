@@ -25,10 +25,17 @@
  * logava no console da Vercel e devolvia 500 para um cron que ninguém lê — o
  * projeto pausava dias depois e a primeira evidência era lead deixando de
  * chegar. Falha de infraestrutura silenciosa é a pior categoria de falha.
+ *
+ * O alerta de CRON_SECRET ausente é o único alcançável SEM autenticação —
+ * qualquer um que bata na rota o dispara. Por isso sai no máximo 1 por hora
+ * (trava no Upstash). Sem Redis não há como coordenar entre instâncias, então
+ * não envia (só loga): melhor um alerta perdido que a caixa inundada.
  */
+import { createHash, timingSafeEqual } from 'node:crypto'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { notifyOpsAlert } from '@/lib/notify'
+import { claimOncePerWindow } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -36,6 +43,24 @@ export const dynamic = 'force-dynamic'
 const IMPACTO = `Enquanto o projeto Supabase estiver pausado ou inacessível, POST /api/lead
 responde 500 e todo lead enviado pelo site — formulário e chat — se perde sem
 deixar rastro.`
+
+const MISSING_SECRET_ALERT_KEY = 'alert:keepalive:cron-secret-ausente'
+const MISSING_SECRET_ALERT_WINDOW_S = 60 * 60
+
+/**
+ * Comparação em tempo constante do header Authorization.
+ *
+ * `!==` retorna no primeiro byte diferente, o que vaza por timing quantos
+ * bytes do token o atacante já acertou. timingSafeEqual lança se os buffers
+ * tiverem tamanhos diferentes — por isso compara os SHA-256 (sempre 32 bytes),
+ * o que também não vaza o tamanho do secret.
+ */
+function isValidCronAuth(authHeader: string | null, cronSecret: string): boolean {
+  if (!authHeader) return false
+  const received = createHash('sha256').update(authHeader).digest()
+  const expected = createHash('sha256').update(`Bearer ${cronSecret}`).digest()
+  return timingSafeEqual(received, expected)
+}
 
 export async function GET(request: NextRequest) {
   // Vercel Cron envia Authorization: Bearer <CRON_SECRET>
@@ -45,6 +70,16 @@ export async function GET(request: NextRequest) {
   // Sem secret configurado, a rota não tem como se defender: recusa.
   if (!cronSecret) {
     console.error('[KeepAlive] CRÍTICO: CRON_SECRET ausente — rota bloqueada')
+    const shouldAlert = await claimOncePerWindow(
+      MISSING_SECRET_ALERT_KEY,
+      MISSING_SECRET_ALERT_WINDOW_S,
+    )
+    if (!shouldAlert) {
+      return NextResponse.json(
+        { ok: false, error: 'Service unavailable' },
+        { status: 503 },
+      )
+    }
     await notifyOpsAlert(
       'Keep-alive do Supabase bloqueado',
       `A rota /api/cron/keep-alive recusou a execução porque CRON_SECRET não
@@ -64,7 +99,7 @@ e refazer o deploy.`,
     )
   }
 
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  if (!isValidCronAuth(authHeader, cronSecret)) {
     return NextResponse.json(
       { ok: false, error: 'Unauthorized' },
       { status: 401 },

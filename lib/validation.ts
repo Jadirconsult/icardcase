@@ -38,8 +38,6 @@ export const leadSchema = z.object({
   origem: z.string().max(100).optional(),
 })
 
-export type LeadInput = z.infer<typeof leadSchema>
-
 export function sanitizeText(input: string): string {
   // Zod já valida estrutura (tamanho, formato). Aqui só neutralizamos HTML.
   return input

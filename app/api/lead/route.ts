@@ -2,6 +2,7 @@
  * POST /api/lead
  *
  * Captura de lead com camadas de segurança:
+ * 0. Origin/Referer dos próprios domínios (403) + Content-Type JSON (415)
  * 1. Rate limiting (3/hora por IP)
  * 2. Honeypot anti-bot
  * 3. Validação Zod
@@ -15,12 +16,33 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { leadSchema, sanitizeText } from '@/lib/validation'
 import { leadFormRateLimit, checkRateLimit, getClientIp, maskIp } from '@/lib/rate-limit'
 import { notifyLeadViaEmail } from '@/lib/notify'
+import { isAllowedOrigin } from '@/lib/origin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+/** `application/json` com ou sem parâmetros (`; charset=utf-8`). */
+function isJsonContentType(request: NextRequest): boolean {
+  const mediaType = request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()
+  return mediaType === 'application/json'
+}
+
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
+
+  // 0a. ORIGIN — fail-closed em produção. Resposta genérica: não conta ao
+  // chamador o que faltou.
+  if (!isAllowedOrigin(request)) {
+    console.warn('[Lead] Origem recusada:', { ip: maskIp(ip) })
+    return NextResponse.json({ ok: false, error: 'Requisição recusada' }, { status: 403 })
+  }
+
+  // 0b. CONTENT-TYPE — só JSON. Um <form> HTML de outro site só consegue mandar
+  // text/plain, urlencoded ou multipart sem preflight; exigir JSON fecha esse
+  // vetor de CSRF mesmo que o Origin seja forjado/omitido.
+  if (!isJsonContentType(request)) {
+    return NextResponse.json({ ok: false, error: 'Content-Type não suportado' }, { status: 415 })
+  }
 
   // 1. RATE LIMIT
   const rateCheck = await checkRateLimit(leadFormRateLimit, ip)

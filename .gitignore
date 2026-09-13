@@ -47,3 +47,6 @@ psi-*.json
 
 # Saida local do skill Impeccable (snapshot de critique + cache do hook)
 .impeccable/
+
+# Prints e logs do Playwright MCP (podem conter dados de contas)
+/.playwright-mcp

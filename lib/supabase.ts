@@ -6,25 +6,13 @@
  * passar mesmo sem variáveis (ex.: primeiro deploy Vercel) e quebra
  * apenas se a rota realmente for chamada sem configuração.
  *
- * - getSupabasePublic(): usa ANON_KEY (respeita RLS), pode ir pro browser
  * - getSupabaseAdmin(): usa SERVICE_ROLE_KEY (bypassa RLS), APENAS server-side
+ *
+ * Não existe cliente público (anon): o front nunca fala com o Supabase, tudo
+ * passa por route handler. O antigo getSupabasePublic() não tinha uso e foi
+ * removido — não recrie sem necessidade real.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-
-let _publicClient: SupabaseClient | null = null
-
-export function getSupabasePublic(): SupabaseClient {
-  if (_publicClient) return _publicClient
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!url || !anonKey) {
-    throw new Error(
-      'Supabase public client não configurado — defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    )
-  }
-  _publicClient = createClient(url, anonKey, { auth: { persistSession: false } })
-  return _publicClient
-}
 
 let _adminClient: SupabaseClient | null = null
 

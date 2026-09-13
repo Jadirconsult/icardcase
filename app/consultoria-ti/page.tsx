@@ -2,21 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
 import { buildWhatsAppUrl, SITE } from '@/lib/constants'
+import { buildMetadata, organizationRef } from '@/lib/seo'
 
 const PAGE_URL = `${SITE.url}/consultoria-ti`
 
-export const metadata: Metadata = {
-  title: 'Consultoria em TI Empresarial · Avaliação Técnica e Modernização',
+export const metadata: Metadata = buildMetadata({
+  title: 'Consultoria em TI: Avaliação e Modernização',
   description:
-    'Consultoria em TI para empresas em todo o Brasil. Avaliação técnica de sistemas, escolha de stack, modernização de legado, due diligence em M&A, second opinion em projetos.',
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Consultoria em TI · Icardcase',
-    description: 'Avaliação técnica, escolha de stack, modernização e due diligence para empresas no Brasil.',
-    url: PAGE_URL,
-    type: 'website',
-  },
-}
+    'Consultoria em TI para empresas de todo o Brasil: avaliação técnica de sistemas, escolha de stack, modernização de legado e due diligence em M&A.',
+  path: '/consultoria-ti',
+})
 
 const faq = [
   {
@@ -50,7 +45,7 @@ export default function ConsultoriaTiPage() {
     '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: 'Consultoria em Tecnologia da Informação',
-    provider: { '@type': 'Organization', name: 'Icardcase', url: SITE.url, telephone: '+55-21-98878-5170' },
+    provider: organizationRef,
     areaServed: { '@type': 'Country', name: 'Brasil' },
     description: 'Consultoria em TI — avaliação técnica, escolha de stack, modernização de legado, due diligence em M&A.',
     url: PAGE_URL,
@@ -75,7 +70,7 @@ export default function ConsultoriaTiPage() {
           <p className="mt-8 max-w-[60ch] text-lg leading-[1.55] text-ink-subtle sm:text-xl">
             Consultoria técnica em TI para empresas em todo o Brasil. Avaliação técnica, escolha de
             stack, modernização de legado, due diligence em M&A, second opinion em projetos. Diagnóstico
-            honesto, mesmo que a recomendação seja "não faça isso".
+            honesto, mesmo que a recomendação seja &ldquo;não faça isso&rdquo;.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a href={buildWhatsAppUrl('Olá! Quero conversar sobre consultoria em TI.')} target="_blank" rel="noopener noreferrer" className="btn-primary">
@@ -134,7 +129,7 @@ export default function ConsultoriaTiPage() {
               ].map((step) => (
                 <li key={step.num} className="py-8 border-b border-hairline">
                   <div className="flex gap-6">
-                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent pt-1">{step.num}</span>
+                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent-text pt-1">{step.num}</span>
                     <div>
                       <h3 className="text-headline text-ink">{step.title}</h3>
                       <p className="mt-3 text-base leading-relaxed text-ink-subtle max-w-[60ch]">{step.body}</p>
@@ -181,8 +176,8 @@ export default function ConsultoriaTiPage() {
               <li key={i} className="border-b border-hairline">
                 <details className="group py-6">
                   <summary className="flex cursor-pointer items-start justify-between gap-6 list-none">
-                    <h3 className="text-headline text-ink group-open:text-accent transition-colors">{item.q}</h3>
-                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent group-open:rotate-45 transition-transform">
+                    <h3 className="text-headline text-ink group-open:text-accent-text transition-colors">{item.q}</h3>
+                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent-text group-open:rotate-45 transition-transform">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 5v14M5 12h14" strokeLinecap="round" />
                       </svg>

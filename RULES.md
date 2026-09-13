@@ -81,11 +81,12 @@ docs/           # documentação operacional/campanha (parte gitignored).
 ## Regras de SEO
 
 - Um `<h1>` por página; hierarquia de headings sem pular nível.
-- `title` e `description` por rota via `export const metadata`. `title` usa o template `%s · Icardcase` (definido no `layout.tsx`).
-- **Canonical por rota** (relativo) via `alternates: { canonical: '/rota' }`. Não há canonical global — de propósito, pra não marcar páginas internas como duplicata da home.
-- Open Graph e Twitter card no `layout.tsx` (defaults) + override por rota quando fizer sentido.
-- **Schema.org JSON-LD**: `ProfessionalService` global no `layout.tsx`; `Service`/`FAQPage` em `/raio-x-de-ti`; `Article`/`BreadcrumbList` em cases/insights.
-- `app/sitemap.ts` e `app/robots.ts` são gerados por código — ao criar rota indexável, adicione o slug no `sitemap.ts`.
+- Metadata por rota **sempre** via `buildMetadata({ title, description, path })` de [lib/seo.ts](lib/seo.ts): gera canonical relativo, `openGraph` e `twitter` completos. O Next substitui (não mescla) openGraph/twitter do layout — objeto parcial na página perde imagem e siteName.
+- `title` usa o template `%s · Icardcase` (definido no `layout.tsx`): o `title` da página tem até ~48 caracteres (60 com o sufixo) e a `description` até 155, palavra-chave principal no início. A home é exceção (título absoluto, decisão do dono).
+- **Canonical por rota** (relativo). Não há canonical global — de propósito, pra não marcar páginas internas como duplicata da home.
+- **Schema.org JSON-LD**: `ProfessionalService` global no `layout.tsx` com `@id` `${SITE.url}/#organization` (dados de `COMPANY`); nas páginas, `provider`/`publisher`/`creator` referenciam `organizationRef` em vez de repetir a organização. `Service`/`FAQPage`/`BreadcrumbList` nas páginas de serviço e landings; `Article`/`CreativeWork` + `BreadcrumbList` em insights/cases.
+- `app/sitemap.ts` e `app/robots.ts` são gerados por código — ao criar rota indexável, adicione a rota no `sitemap.ts` com `lastModified` real (data da última revisão, nunca `new Date()`). Posts e cases entram sozinhos a partir de `lib/insights.ts` e `lib/cases.ts`.
+- Anos de empresa: `yearsInBusiness()` de `lib/constants.ts`, nunca número fixo no texto.
 
 ## Boas práticas específicas deste projeto
 

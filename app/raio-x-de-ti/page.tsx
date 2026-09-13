@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
-import { buildWhatsAppUrl, COMPANY, SITE } from '@/lib/constants'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { COMPANY, SITE, yearsInBusiness } from '@/lib/constants'
+import { breadcrumbSchema, buildMetadata, organizationRef } from '@/lib/seo'
 
 const PAGE_URL = `${SITE.url}/raio-x-de-ti`
 
@@ -17,19 +19,12 @@ const VAGAS_MES = 4
 const WHATSAPP_TEXT =
   'Olá! Quero agendar o Raio-X de TI do meu escritório contábil.'
 
-export const metadata: Metadata = {
-  title: 'Raio-X de Infraestrutura e Riscos de TI para Contabilidades',
+export const metadata: Metadata = buildMetadata({
+  title: 'Raio-X de TI para escritórios contábeis',
   description:
-    'Análise técnica da infraestrutura do seu escritório contábil: backup, certificado digital, servidor e acessos. Relatório com matriz de risco + reunião com especialista. Valor abatido se contratar plano mensal.',
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Raio-X de TI para Contabilidades · Icardcase',
-    description:
-      'Descubra hoje os riscos que podem custar o prazo do SPED amanhã. Relatório técnico com matriz de risco, direto ao sócio.',
-    url: PAGE_URL,
-    type: 'website',
-  },
-}
+    'Raio-X de TI para escritório contábil: análise de backup, certificado digital, servidor e acessos, com matriz de risco e reunião com especialista.',
+  path: '/raio-x-de-ti',
+})
 
 const dores = [
   {
@@ -91,19 +86,12 @@ const faq = [
 ]
 
 export default function RaioXPage() {
-  const whatsappUrl = buildWhatsAppUrl(WHATSAPP_TEXT)
-
   const serviceSchema = {
     '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: 'Diagnóstico de infraestrutura e riscos de TI para escritórios contábeis',
     name: 'Raio-X de Infraestrutura e Riscos de TI',
-    provider: {
-      '@type': 'Organization',
-      name: 'Icardcase',
-      url: SITE.url,
-      telephone: '+55-21-98878-5170',
-    },
+    provider: organizationRef,
     areaServed: { '@type': 'City', name: 'Niterói' },
     offers: {
       '@type': 'Offer',
@@ -123,6 +111,7 @@ export default function RaioXPage() {
       acceptedAnswer: { '@type': 'Answer', text: i.a },
     })),
   }
+  const breadcrumb = breadcrumbSchema([{ name: 'Raio-X de TI', path: '/raio-x-de-ti' }])
 
   return (
     <>
@@ -133,6 +122,10 @@ export default function RaioXPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
       {/* Topo mínimo: só logo (link para a home), sem navegação — landing isolada */}
@@ -169,14 +162,9 @@ export default function RaioXPage() {
             descubra o problema por você.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
+            <WhatsAppButton origem="raiox_hero" message={WHATSAPP_TEXT}>
               Agendar meu Raio-X de TI
-            </a>
+            </WhatsAppButton>
             <a href="#como-funciona" className="btn-secondary">
               Ver o que está incluído
             </a>
@@ -274,7 +262,7 @@ export default function RaioXPage() {
         <div className="container-content max-w-3xl">
           <span className="eyebrow">Quem faz a análise</span>
           <h2 className="mt-6 text-display-md text-ink">
-            14 anos de TI. Nenhum estagiário no seu servidor.
+            {yearsInBusiness()} anos de TI. Nenhum estagiário no seu servidor.
           </h2>
           <p className="mt-6 leading-relaxed text-ink-subtle">
             Sou Jadir Luiz de Oliveira Junior, fundador da Icardcase. Atendo
@@ -309,14 +297,9 @@ export default function RaioXPage() {
             {VAGAS_MES} análises por mês. As deste mês começam por ordem de agendamento.
           </h2>
           <div className="mt-10 flex justify-center">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
+            <WhatsAppButton origem="raiox_final" message={WHATSAPP_TEXT}>
               Agendar meu Raio-X de TI
-            </a>
+            </WhatsAppButton>
           </div>
           <p className="mt-6 text-sm text-ink-subtle">
             Resposta em até 4 horas úteis, direto com quem analisa.

@@ -2,21 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
 import { buildWhatsAppUrl, SITE } from '@/lib/constants'
+import { buildMetadata, organizationRef } from '@/lib/seo'
 
 const PAGE_URL = `${SITE.url}/seguranca-lgpd`
 
-export const metadata: Metadata = {
-  title: 'Segurança da Informação e Adequação LGPD para Empresas',
+export const metadata: Metadata = buildMetadata({
+  title: 'Segurança da Informação e Adequação LGPD',
   description:
-    'Consultoria em segurança da informação e adequação LGPD para empresas em todo o Brasil. Gap analysis, plano de adequação, implementação técnica, treinamento de equipe e auditoria.',
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Segurança da Informação e LGPD · Icardcase',
-    description: 'Consultoria LGPD e segurança aplicada — gap analysis, implementação técnica, treinamento.',
-    url: PAGE_URL,
-    type: 'website',
-  },
-}
+    'Segurança da informação e adequação LGPD para empresas de todo o Brasil: gap analysis, plano de adequação, implementação técnica, treinamento e auditoria.',
+  path: '/seguranca-lgpd',
+})
 
 const faq = [
   {
@@ -29,7 +24,9 @@ const faq = [
   },
   {
     q: 'O que envolve uma adequação completa?',
-    a: '23 itens distribuídos em 4 categorias: Governança (DPO, RIPD, política de privacidade), Tecnologia (criptografia, controle de acesso, audit log, backup), Processos (treinamento, contratos de fornecedor, procedimento de incidente), Compliance (atendimento a direitos do titular, DPIA). Veja o checklist completo no nosso post de LGPD em /insights.',
+    a: '23 itens distribuídos em 4 categorias: Governança (DPO, RIPD, política de privacidade), Tecnologia (criptografia, controle de acesso, audit log, backup), Processos (treinamento, contratos de fornecedor, procedimento de incidente), Compliance (atendimento a direitos do titular, DPIA).',
+    // Link interno renderizado após a resposta (antes citava /insights só como texto)
+    link: { href: '/insights/lgpd-escritorio-contabil', label: 'Veja o checklist completo no nosso post de LGPD' },
   },
   {
     q: 'Vocês fazem só a parte técnica ou também a documental?',
@@ -50,7 +47,7 @@ export default function SegurancaLgpdPage() {
     '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: 'Consultoria em Segurança da Informação e LGPD',
-    provider: { '@type': 'Organization', name: 'Icardcase', url: SITE.url, telephone: '+55-21-98878-5170' },
+    provider: organizationRef,
     areaServed: { '@type': 'Country', name: 'Brasil' },
     description: 'Consultoria em segurança da informação e adequação LGPD — gap analysis, implementação técnica e documental, treinamento, auditoria.',
     url: PAGE_URL,
@@ -75,7 +72,7 @@ export default function SegurancaLgpdPage() {
           <p className="mt-8 max-w-[60ch] text-lg leading-[1.55] text-ink-subtle sm:text-xl">
             Consultoria em segurança da informação e adequação LGPD para empresas em todo o Brasil.
             Implementação técnica e documental, treinamento de equipe, plano de resposta a incidentes,
-            auditoria periódica. Sem vender ilusão de "certificado".
+            auditoria periódica. Sem vender ilusão de &ldquo;certificado&rdquo;.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a href={buildWhatsAppUrl('Olá! Quero conversar sobre adequação LGPD da minha empresa.')} target="_blank" rel="noopener noreferrer" className="btn-primary">
@@ -134,7 +131,7 @@ export default function SegurancaLgpdPage() {
               ].map((step) => (
                 <li key={step.num} className="py-8 border-b border-hairline">
                   <div className="flex gap-6">
-                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent pt-1">{step.num}</span>
+                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent-text pt-1">{step.num}</span>
                     <div>
                       <h3 className="text-headline text-ink">{step.title}</h3>
                       <p className="mt-3 text-base leading-relaxed text-ink-subtle max-w-[60ch]">{step.body}</p>
@@ -181,14 +178,25 @@ export default function SegurancaLgpdPage() {
               <li key={i} className="border-b border-hairline">
                 <details className="group py-6">
                   <summary className="flex cursor-pointer items-start justify-between gap-6 list-none">
-                    <h3 className="text-headline text-ink group-open:text-accent transition-colors">{item.q}</h3>
-                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent group-open:rotate-45 transition-transform">
+                    <h3 className="text-headline text-ink group-open:text-accent-text transition-colors">{item.q}</h3>
+                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent-text group-open:rotate-45 transition-transform">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 5v14M5 12h14" strokeLinecap="round" />
                       </svg>
                     </span>
                   </summary>
-                  <p className="mt-4 max-w-[68ch] text-base leading-relaxed text-ink-subtle">{item.a}</p>
+                  <p className="mt-4 max-w-[68ch] text-base leading-relaxed text-ink-subtle">
+                    {item.a}
+                    {item.link && (
+                      <>
+                        {' '}
+                        <Link href={item.link.href} className="underline underline-offset-4 hover:text-ink">
+                          {item.link.label}
+                        </Link>
+                        .
+                      </>
+                    )}
+                  </p>
                 </details>
               </li>
             ))}

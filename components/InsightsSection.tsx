@@ -1,7 +1,5 @@
-'use client'
-
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Reveal } from '@/components/Reveal'
 
 const posts = [
   {
@@ -28,27 +26,8 @@ const posts = [
 ]
 
 export function InsightsSection() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = sectionRef.current
-    if (!node) return
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.15 },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [])
-
   return (
-    <section ref={sectionRef} className="relative bg-canvas section-y border-t border-hairline">
+    <section className="relative bg-canvas section-y border-t border-hairline">
       <div className="container-content">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
           <div className="max-w-2xl">
@@ -81,18 +60,12 @@ export function InsightsSection() {
         {/* Lista — Linear changelog-style: hairline divider, denso */}
         <ul className="border-t border-hairline">
           {posts.map((post, i) => (
-            <li
-              key={post.slug}
-              className={`transition-all duration-500 ease-out ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ transitionDelay: `${i * 100}ms` }}
-            >
+            <Reveal key={post.slug} as="li" delay={i * 100}>
               <Link
                 href={`/insights/${post.slug}`}
                 className="group flex items-baseline gap-6 py-7 border-b border-hairline transition-all duration-300 hover:border-hairline-strong"
               >
-                <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent">
+                <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent-text">
                   {post.num}
                 </span>
 
@@ -101,12 +74,12 @@ export function InsightsSection() {
                     <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">
                       {post.category}
                     </span>
-                    <span className="text-ink-tertiary">·</span>
+                    <span className="text-ink-tertiary" aria-hidden="true">·</span>
                     <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">
                       {post.readTime} de leitura
                     </span>
                   </div>
-                  <h3 className="text-headline text-ink leading-snug transition-colors duration-300 group-hover:text-accent max-w-[60ch]">
+                  <h3 className="text-headline text-ink leading-snug transition-colors duration-300 group-hover:text-accent-text max-w-[60ch]">
                     {post.title}
                   </h3>
                 </div>
@@ -118,13 +91,13 @@ export function InsightsSection() {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
-                  className="flex-shrink-0 self-center text-ink-tertiary transition-all duration-500 group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1"
+                  className="flex-shrink-0 self-center text-ink-tertiary transition-all duration-500 group-hover:text-accent-text group-hover:translate-x-1 group-hover:-translate-y-1"
                   aria-hidden="true"
                 >
                   <path d="M7 17L17 7M7 7h10v10" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

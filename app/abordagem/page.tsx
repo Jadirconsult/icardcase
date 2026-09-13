@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Como trabalhamos',
   description: 'A metodologia da Icardcase para desenvolvimento de sistemas, gestão de infraestrutura e suporte técnico. Engenharia, não suporte.',
-  alternates: { canonical: '/abordagem' },
-}
+  path: '/abordagem',
+})
 
 export default function AbordagemPage() {
   return (

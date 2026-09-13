@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { trackLeadConversion, trackLeadError } from '@/lib/analytics'
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -18,9 +20,38 @@ interface FormData {
   website: string // honeypot
 }
 
+type FieldKey = Exclude<keyof FormData, 'website'>
+
+interface LeadResponse {
+  ok?: boolean
+  id?: string
+  error?: string
+  issues?: Record<string, string[] | undefined>
+}
+
 const INITIAL: FormData = {
   nome: '', email: '', whatsapp: '', empresa: '',
   segmento: '', mensagem: '', consentimentoLgpd: false, website: '',
+}
+
+/* Ordem visual dos campos — o foco vai para o primeiro inválido. */
+const FIELD_ORDER: FieldKey[] = ['nome', 'empresa', 'email', 'whatsapp', 'segmento', 'mensagem', 'consentimentoLgpd']
+
+/* id do elemento no DOM (o checkbox manteve o id histórico). */
+const DOM_ID: Record<FieldKey, string> = {
+  nome: 'nome',
+  empresa: 'empresa',
+  email: 'email',
+  whatsapp: 'whatsapp',
+  segmento: 'segmento',
+  mensagem: 'mensagem',
+  consentimentoLgpd: 'consentimento',
+}
+
+const errorId = (key: FieldKey) => `${DOM_ID[key]}-error`
+
+function isFieldKey(key: string): key is FieldKey {
+  return (FIELD_ORDER as string[]).includes(key)
 }
 
 export function LeadForm() {
@@ -28,8 +59,11 @@ export function LeadForm() {
   const [state, setState] = useState<FormState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  // Objeto novo a cada pedido: o efeito roda mesmo repetindo o mesmo alvo.
+  const [focusRequest, setFocusRequest] = useState<{ target: FieldKey | 'summary' } | null>(null)
   const searchParams = useSearchParams()
   const successRef = useRef<HTMLDivElement>(null)
+  const summaryRef = useRef<HTMLDivElement>(null)
 
   // A11y: quando entra em success, move foco pra o card — leitor de tela
   // anuncia a confirmação sem depender de o usuário estar navegando.
@@ -39,22 +73,22 @@ export function LeadForm() {
     }
   }, [state])
 
-  // Captura UTMs da URL
-  const [utms, setUtms] = useState({
-    utm_source: '',
-    utm_medium: '',
-    utm_campaign: '',
-    origem: 'formulario_contato',
-  })
-
+  // Depois de um envio recusado, o foco vai para o primeiro campo inválido
+  // (o leitor lê o erro via aria-describedby) ou para o resumo do erro.
   useEffect(() => {
-    setUtms({
-      utm_source: searchParams.get('utm_source') || '',
-      utm_medium: searchParams.get('utm_medium') || '',
-      utm_campaign: searchParams.get('utm_campaign') || '',
-      origem: searchParams.get('origem') || 'formulario_contato',
-    })
-  }, [searchParams])
+    if (!focusRequest) return
+    if (focusRequest.target === 'summary') summaryRef.current?.focus()
+    else document.getElementById(DOM_ID[focusRequest.target])?.focus()
+  }, [focusRequest])
+
+  // UTMs lidas da URL no render: useSearchParams já é reativo, não precisa
+  // de estado + efeito espelhando o mesmo valor.
+  const utms = {
+    utm_source: searchParams.get('utm_source') || '',
+    utm_medium: searchParams.get('utm_medium') || '',
+    utm_campaign: searchParams.get('utm_campaign') || '',
+    origem: searchParams.get('origem') || 'formulario_contato',
+  }
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setData((prev) => ({ ...prev, [key]: value }))
@@ -108,6 +142,19 @@ export function LeadForm() {
     e.preventDefault()
     if (state === 'submitting') return
 
+    // Botão fica habilitado de propósito: disabled não recebe foco nem explica
+    // nada. Sem o aceite LGPD, o envio para aqui com mensagem e foco no checkbox.
+    if (!data.consentimentoLgpd) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        consentimentoLgpd: ['Para enviar, marque que concorda com a Política de Privacidade.'],
+      }))
+      setErrorMessage('Falta autorizar o uso dos seus dados (LGPD) para podermos responder.')
+      setState('error')
+      setFocusRequest({ target: 'consentimentoLgpd' })
+      return
+    }
+
     setState('submitting')
     setErrorMessage('')
     setFieldErrors({})
@@ -119,27 +166,61 @@ export function LeadForm() {
         body: JSON.stringify({ ...data, ...utms }),
       })
 
-      const result = await response.json()
+      const result = (await response.json().catch(() => ({}))) as LeadResponse
 
       if (!response.ok) {
+        trackLeadError(response.status, utms.origem)
         if (response.status === 429) {
           setErrorMessage(result.error || 'Muitas tentativas. Tente em alguns minutos.')
+          setFocusRequest({ target: 'summary' })
         } else if (response.status === 400 && result.issues) {
-          setFieldErrors(result.issues)
+          const issues: Record<string, string[]> = {}
+          for (const [key, messages] of Object.entries(result.issues)) {
+            if (messages?.length) issues[key] = messages
+          }
+          setFieldErrors(issues)
           setErrorMessage('Verifique os campos destacados.')
+          setFocusRequest({ target: FIELD_ORDER.find((k) => issues[k]) ?? 'summary' })
         } else {
           setErrorMessage(result.error || 'Erro ao enviar. Tente o WhatsApp direto.')
+          setFocusRequest({ target: 'summary' })
         }
         setState('error')
         return
       }
 
+      trackLeadConversion({ id: result.id, origem: utms.origem })
       setState('success')
       setData(INITIAL)
     } catch {
+      trackLeadError('rede', utms.origem)
       setErrorMessage('Erro de conexão. Tente novamente ou use o WhatsApp.')
       setState('error')
+      setFocusRequest({ target: 'summary' })
     }
+  }
+
+  // Erros do servidor em chaves sem campo visível (utm_*, origem): vão para o resumo.
+  const extraErrors = Object.entries(fieldErrors)
+    .filter(([key]) => !isFieldKey(key))
+    .flatMap(([, messages]) => messages)
+
+  const invalid = (key: FieldKey) => Boolean(fieldErrors[key]?.length)
+  const describedBy = (key: FieldKey, ...extra: string[]) => {
+    const ids = [...extra, ...(invalid(key) ? [errorId(key)] : [])]
+    return ids.length ? ids.join(' ') : undefined
+  }
+
+  // Helper de render (não componente): definido aqui dentro ele remontaria o
+  // <p> a cada render e reanunciaria o aria-live.
+  const fieldError = (field: FieldKey) => {
+    const messages = fieldErrors[field]
+    if (!messages?.length) return null
+    return (
+      <p id={errorId(field)} aria-live="polite" className="field-error">
+        {messages.join(' · ')}
+      </p>
+    )
   }
 
   if (state === 'success') {
@@ -149,7 +230,7 @@ export function LeadForm() {
         tabIndex={-1}
         role="status"
         aria-live="polite"
-        className="surface-card p-8 text-center border-accent/30 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-canvas"
+        className="surface-card p-8 text-center border-accent/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-text focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       >
         <Image
           src="/icardinho.png"
@@ -160,7 +241,7 @@ export function LeadForm() {
           className="mx-auto mb-4 drop-shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
         />
         <h3 className="text-xl font-semibold text-ink mb-2">
-          <CheckCircle2 className="inline h-5 w-5 text-accent mr-1.5 -mt-0.5" aria-hidden="true" />
+          <CheckCircle2 className="inline h-5 w-5 text-accent-text mr-1.5 -mt-0.5" aria-hidden="true" />
           Contato recebido!
         </h3>
         <p className="text-ink-muted leading-relaxed">
@@ -170,7 +251,7 @@ export function LeadForm() {
         <button
           type="button"
           onClick={() => setState('idle')}
-          className="mt-6 text-sm text-accent hover:text-accent-hover hover:underline font-medium"
+          className="mt-4 inline-flex min-h-[44px] items-center text-sm font-medium text-accent-text hover:text-ink hover:underline underline-offset-4"
         >
           Enviar outro contato
         </button>
@@ -178,8 +259,10 @@ export function LeadForm() {
     )
   }
 
+  const submitting = state === 'submitting'
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-busy={submitting}>
       {/* Honeypot — invisível pra humano, bot preenche */}
       <div className="absolute left-[-9999px]" aria-hidden="true">
         <label htmlFor="website">Não preencha este campo</label>
@@ -209,14 +292,11 @@ export function LeadForm() {
             value={data.nome}
             onChange={(e) => update('nome', e.target.value)}
             onBlur={(e) => validateField('nome', e.target.value)}
-            disabled={state === 'submitting'}
-            aria-invalid={!!fieldErrors.nome}
-            aria-describedby={fieldErrors.nome ? 'nome-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
+            aria-invalid={invalid('nome')}
+            aria-describedby={describedBy('nome')}
+            className="field-input"
           />
-          {fieldErrors.nome?.[0] && (
-            <p id="nome-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.nome[0]}</p>
-          )}
+          {fieldError('nome')}
         </div>
 
         <div>
@@ -233,14 +313,11 @@ export function LeadForm() {
             value={data.empresa}
             onChange={(e) => update('empresa', e.target.value)}
             onBlur={(e) => validateField('empresa', e.target.value)}
-            disabled={state === 'submitting'}
-            aria-invalid={!!fieldErrors.empresa}
-            aria-describedby={fieldErrors.empresa ? 'empresa-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
+            aria-invalid={invalid('empresa')}
+            aria-describedby={describedBy('empresa')}
+            className="field-input"
           />
-          {fieldErrors.empresa?.[0] && (
-            <p id="empresa-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.empresa[0]}</p>
-          )}
+          {fieldError('empresa')}
         </div>
       </div>
 
@@ -259,14 +336,11 @@ export function LeadForm() {
             value={data.email}
             onChange={(e) => update('email', e.target.value)}
             onBlur={(e) => validateField('email', e.target.value)}
-            disabled={state === 'submitting'}
-            aria-invalid={!!fieldErrors.email}
-            aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
+            aria-invalid={invalid('email')}
+            aria-describedby={describedBy('email')}
+            className="field-input"
           />
-          {fieldErrors.email?.[0] && (
-            <p id="email-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.email[0]}</p>
-          )}
+          {fieldError('email')}
         </div>
 
         <div>
@@ -283,14 +357,11 @@ export function LeadForm() {
             value={data.whatsapp}
             onChange={(e) => update('whatsapp', e.target.value)}
             onBlur={(e) => validateField('whatsapp', e.target.value)}
-            disabled={state === 'submitting'}
-            aria-invalid={!!fieldErrors.whatsapp}
-            aria-describedby={fieldErrors.whatsapp ? 'whatsapp-error' : undefined}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
+            aria-invalid={invalid('whatsapp')}
+            aria-describedby={describedBy('whatsapp')}
+            className="field-input"
           />
-          {fieldErrors.whatsapp?.[0] && (
-            <p id="whatsapp-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.whatsapp[0]}</p>
-          )}
+          {fieldError('whatsapp')}
         </div>
       </div>
 
@@ -303,8 +374,9 @@ export function LeadForm() {
           required
           value={data.segmento}
           onChange={(e) => update('segmento', e.target.value as FormData['segmento'])}
-          disabled={state === 'submitting'}
-          className="w-full min-h-[44px] px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60"
+          aria-invalid={invalid('segmento')}
+          aria-describedby={describedBy('segmento')}
+          className="field-input"
         >
           <option value="" disabled>Selecione…</option>
           <option value="contabilidade">Escritório contábil</option>
@@ -312,6 +384,7 @@ export function LeadForm() {
           <option value="industria">Indústria / Empresa</option>
           <option value="outro">Outro</option>
         </select>
+        {fieldError('segmento')}
       </div>
 
       <div>
@@ -328,53 +401,82 @@ export function LeadForm() {
           value={data.mensagem}
           onChange={(e) => update('mensagem', e.target.value)}
           onBlur={(e) => validateField('mensagem', e.target.value)}
-          disabled={state === 'submitting'}
           placeholder="Conta um pouco sobre o que você precisa: sistema novo? migração de legado? suporte recorrente? infraestrutura?"
-          aria-invalid={!!fieldErrors.mensagem}
-          aria-describedby={fieldErrors.mensagem ? 'mensagem-error mensagem-counter' : 'mensagem-counter'}
-          className="w-full px-4 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary focus:border-accent focus:ring-2 focus:ring-accent/30 focus:outline-none transition-colors disabled:opacity-60 resize-y"
+          aria-invalid={invalid('mensagem')}
+          aria-describedby={describedBy('mensagem', 'mensagem-counter')}
+          className="field-input resize-y"
         />
         <p id="mensagem-counter" className="mt-1 text-xs text-ink-subtle">
           {data.mensagem.length}/2000 caracteres
         </p>
-        {fieldErrors.mensagem?.[0] && (
-          <p id="mensagem-error" role="alert" aria-live="polite" className="mt-1 text-xs text-red-400">{fieldErrors.mensagem[0]}</p>
-        )}
+        {fieldError('mensagem')}
       </div>
 
-      <div className="flex items-start gap-3 rounded-md border border-hairline bg-surface-1 p-4">
-        <input
-          type="checkbox"
-          id="consentimento"
-          required
-          checked={data.consentimentoLgpd}
-          onChange={(e) => update('consentimentoLgpd', e.target.checked)}
-          disabled={state === 'submitting'}
-          className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-hairline-strong bg-surface-2 text-accent accent-accent focus:ring-2 focus:ring-accent/30"
-        />
-        <label htmlFor="consentimento" className="text-sm text-ink leading-relaxed">
-          Concordo com a{' '}
-          <a href="/politica-privacidade" target="_blank" className="text-accent hover:text-accent-hover hover:underline font-medium">
-            Política de Privacidade
-          </a>{' '}
-          da Icardcase e autorizo o tratamento dos meus dados para contato comercial,
-          conforme a LGPD (Lei 13.709/2018). *
-        </label>
+      <div>
+        <div
+          className={cn(
+            'flex items-start gap-3 rounded-md border bg-surface-1 p-4 transition-colors',
+            invalid('consentimentoLgpd') ? 'border-danger-text' : 'border-hairline',
+          )}
+        >
+          <input
+            type="checkbox"
+            id="consentimento"
+            required
+            checked={data.consentimentoLgpd}
+            onChange={(e) => update('consentimentoLgpd', e.target.checked)}
+            aria-invalid={invalid('consentimentoLgpd')}
+            aria-describedby={describedBy('consentimentoLgpd')}
+            className="mt-1 h-4 w-4 flex-shrink-0 cursor-pointer accent-accent"
+          />
+          <label htmlFor="consentimento" className="cursor-pointer text-sm text-ink leading-relaxed">
+            Concordo com a{' '}
+            <a
+              href="/politica-privacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent-text underline underline-offset-2 hover:text-ink"
+            >
+              Política de Privacidade
+              <span className="sr-only"> (abre em nova aba)</span>
+            </a>{' '}
+            da Icardcase e autorizo o tratamento dos meus dados para contato comercial,
+            conforme a LGPD (Lei 13.709/2018). *
+          </label>
+        </div>
+        {fieldError('consentimentoLgpd')}
       </div>
 
       {state === 'error' && errorMessage && (
-        <div className="flex items-start gap-3 rounded-md border border-red-500/40 bg-red-950/40 p-4" role="alert">
-          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-red-200">{errorMessage}</p>
+        <div
+          ref={summaryRef}
+          tabIndex={-1}
+          role="alert"
+          className="flex items-start gap-3 rounded-md border border-danger/40 bg-danger/10 p-4 focus:outline-none"
+        >
+          <AlertCircle className="h-5 w-5 text-danger-text flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="text-sm text-ink">
+            <p>{errorMessage}</p>
+            {extraErrors.length > 0 && (
+              <ul className="mt-2 list-disc pl-4 text-ink-muted">
+                {extraErrors.map((msg) => (
+                  <li key={msg}>{msg}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       )}
 
+      {/* aria-disabled (não disabled) durante o envio: o botão segura o foco
+          e o handler já bloqueia re-submit. */}
       <button
         type="submit"
-        disabled={state === 'submitting' || !data.consentimentoLgpd}
-        className="w-full sm:w-auto inline-flex min-h-[44px] items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:bg-surface-2 disabled:text-ink-tertiary disabled:cursor-not-allowed text-white px-8 py-3 rounded-md font-medium transition-colors"
+        aria-disabled={submitting}
+        aria-describedby="lead-form-nota"
+        className="btn-primary btn-lg btn-block sm:w-auto"
       >
-        {state === 'submitting' ? (
+        {submitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             Enviando…
@@ -384,8 +486,8 @@ export function LeadForm() {
         )}
       </button>
 
-      <p className="text-xs text-ink-subtle">
-        * Campos obrigatórios. Não compartilhamos seus dados.
+      <p id="lead-form-nota" className="text-xs text-ink-subtle">
+        * Campos obrigatórios. O envio exige a autorização LGPD acima. Não compartilhamos seus dados.
       </p>
     </form>
   )

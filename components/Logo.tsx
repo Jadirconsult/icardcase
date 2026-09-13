@@ -8,23 +8,29 @@ interface LogoProps {
 }
 
 export function Logo({ className, variant = 'light', showText = true }: LogoProps) {
-  const textColor = variant === 'dark' ? '#FFFFFF' : '#081F4D'
-
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      {/* Logo oficial (PNG transparente, 152×216). unoptimized: serve o arquivo
-          direto em /logo-icardcase-mark.png, que leitores externos conseguem baixar. */}
+      {/* Logo oficial (PNG transparente, 50×72 = 2x do tamanho exibido).
+          unoptimized: serve o arquivo direto em /logo-icardcase-mark.png, que
+          leitores externos conseguem baixar. Sem `priority`: não é o LCP.
+          Com o texto ao lado, a imagem é decorativa (alt vazio) — senão o
+          leitor de tela anunciaria "Icardcase logo icardcase". */}
       <Image
         src="/logo-icardcase-mark.png"
-        alt="Icardcase logo"
+        alt={showText ? '' : 'Icardcase'}
+        aria-hidden={showText ? true : undefined}
         width={25}
         height={36}
         unoptimized
-        priority
         className="h-9 w-auto"
       />
       {showText && (
-        <span className="text-lg font-semibold tracking-tight" style={{ color: textColor }}>
+        <span
+          className={cn(
+            'text-lg font-semibold tracking-tight',
+            variant === 'dark' ? 'text-ink' : 'text-surface-1',
+          )}
+        >
           icardcase
         </span>
       )}

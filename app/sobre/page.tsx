@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
-import { COMPANY } from '@/lib/constants'
+import { COMPANY, yearsInBusiness } from '@/lib/constants'
+import { buildMetadata } from '@/lib/seo'
 import { FinalCTA } from '@/components/FinalCTA'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Quem somos — tecnologia sob medida desde 2011',
-  description: `Há 14 anos a ${COMPANY.name} constrói sistemas críticos sob medida para empresas de todo o Brasil. Conheça nosso time, a história e a forma de trabalhar. Base no Rio de Janeiro.`,
-  alternates: { canonical: '/sobre' },
-}
+  description: `Há ${yearsInBusiness()} anos a ${COMPANY.name} constrói sistemas críticos sob medida para empresas de todo o Brasil. Conheça a história e a forma de trabalhar.`,
+  path: '/sobre',
+})
 
 export default function SobrePage() {
   return (
@@ -40,7 +41,7 @@ export default function SobrePage() {
             </div>
             <div>
               <dt className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-subtle">Anos no RJ</dt>
-              <dd className="mt-2 text-display-md text-ink">14+</dd>
+              <dd className="mt-2 text-display-md text-ink">{yearsInBusiness()}+</dd>
             </div>
             <div>
               <dt className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-subtle">Sistemas em produção</dt>

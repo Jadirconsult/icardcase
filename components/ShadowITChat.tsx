@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Send, ShieldAlert, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { trackLeadConversion, trackLeadError } from '@/lib/analytics'
 
 /**
  * Diagnóstico de Shadow IT por conversa — substitui o formulário de 6 campos.
@@ -86,8 +87,25 @@ interface Respostas {
   saida: string | null
 }
 
+type CampoContato = 'nome' | 'empresa' | 'email' | 'whatsapp'
+type ErrosCampo = Partial<Record<CampoContato, string>>
+
+interface LeadResponse {
+  id?: string
+  error?: string
+  issues?: Record<string, string[] | undefined>
+}
+
 const ABERTURA =
   'Shadow IT é quando a sua equipe resolve na planilha o que o sistema não resolve. Não é indisciplina — é sintoma. Em menos de um minuto eu estimo o tamanho da sua exposição, sem você digitar formulário nenhum.'
+
+/* Mesma regra do leadSchema (lib/validation.ts): barra no chat o que o
+   servidor recusaria, com mensagem em vez de "Dados inválidos". */
+const NOME_VALIDO = /^[\p{L}\s'-]+$/u
+const EMAIL_VALIDO = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+
+/* Primeiro controle focável do passo. O honeypot (tabIndex -1) fica de fora. */
+const FOCAVEL = '[data-autofocus], button:not([disabled]), input:not([tabindex="-1"]), a[href]'
 
 export function ShadowITChat() {
   const searchParams = useSearchParams()
@@ -104,14 +122,27 @@ export function ShadowITChat() {
   const [whatsapp, setWhatsapp] = useState('')
   const [website, setWebsite] = useState('') // honeypot
   const [erro, setErro] = useState('')
+  const [errosCampo, setErrosCampo] = useState<ErrosCampo>({})
   const [digitando, setDigitando] = useState(false)
 
   const nextId = useRef(2)
   const logRef = useRef<HTMLDivElement>(null)
+  const controlesRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useRef(false)
+  const timers = useRef<number[]>([])
+  // true quando o usuário avançou um passo e o foco precisa acompanhar.
+  const focoPendente = useRef(false)
 
   useEffect(() => {
     reduceMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }, [])
+
+  // Limpa as pausas de digitação pendentes se o chat desmontar no meio.
+  useEffect(() => {
+    const pendentes = timers.current
+    return () => {
+      pendentes.forEach((id) => window.clearTimeout(id))
+    }
   }, [])
 
   /* Rola só o log, nunca a página: puxar a viewport embaixo do usuário é
@@ -120,6 +151,21 @@ export function ShadowITChat() {
     const el = logRef.current
     if (el) el.scrollTop = el.scrollHeight
   }, [messages, step, digitando])
+
+  /* O botão clicado some a cada passo e o foco caía no body — teclado e leitor
+     de tela perdiam o lugar. Quando o bot termina de "digitar", o foco vai
+     para o primeiro controle do passo novo. Se a pessoa já tabulou para
+     dentro dos controles nesse meio-tempo, respeita. */
+  useEffect(() => {
+    if (!focoPendente.current || digitando) return
+    const area = controlesRef.current
+    if (!area) return
+    const alvo = area.querySelector<HTMLElement>(FOCAVEL)
+    if (!alvo) return // passo ainda sem controles (ex.: diagnóstico sendo digitado)
+    focoPendente.current = false
+    if (area.contains(document.activeElement)) return
+    alvo.focus({ preventScroll: true })
+  }, [step, digitando])
 
   const push = useCallback((author: Author, text: string) => {
     setMessages((prev) => [...prev, { id: nextId.current++, author, text }])
@@ -130,28 +176,31 @@ export function ShadowITChat() {
   const botSays = useCallback(
     (linhas: string[], depois?: () => void) => {
       const delay = reduceMotion.current ? 0 : 550
-      let acc = 0
       setDigitando(true)
       linhas.forEach((linha, i) => {
-        acc += delay
-        setTimeout(() => {
+        const id = window.setTimeout(() => {
           push('bot', linha)
           if (i === linhas.length - 1) {
             setDigitando(false)
             depois?.()
           }
-        }, acc)
+        }, delay * (i + 1))
+        timers.current.push(id)
       })
-      if (delay === 0) setDigitando(false)
     },
     [push],
   )
+
+  function avancar(proximo: Step) {
+    focoPendente.current = true
+    setStep(proximo)
+  }
 
   function escolherSegmento(seg: Segmento) {
     const label = SEGMENTOS.find((s) => s.id === seg)?.label ?? ''
     push('user', label)
     setRespostas((r) => ({ ...r, segmento: seg }))
-    setStep('sintomas')
+    avancar('sintomas')
     botSays([RISCO_SETOR[seg], 'Quais destes existem hoje na sua operação? Marque quantos quiser — ninguém está julgando, isso é rotina em empresa que cresceu rápido.'])
   }
 
@@ -159,7 +208,7 @@ export function ShadowITChat() {
     const labels = sintomasSel.map((id) => SINTOMAS.find((s) => s.id === id)?.label).filter(Boolean)
     push('user', labels.length ? labels.join(' · ') : 'Nenhum desses')
     setRespostas((r) => ({ ...r, sintomas: sintomasSel }))
-    setStep('saida')
+    avancar('saida')
     botSays(['Última pergunta antes do diagnóstico: quando alguém da equipe sai da empresa, o que acontece com o que essa pessoa controlava?'])
   }
 
@@ -168,7 +217,7 @@ export function ShadowITChat() {
     push('user', label)
     const proximas = { ...respostas, saida: id }
     setRespostas(proximas)
-    setStep('diagnostico')
+    avancar('diagnostico')
 
     const pesoSintomas = sintomasSel.reduce(
       (acc, sid) => acc + (SINTOMAS.find((s) => s.id === sid)?.peso ?? 0),
@@ -194,35 +243,61 @@ export function ShadowITChat() {
     ], () => setStep('identificacao'))
   }
 
+  function limparErro(campo: CampoContato) {
+    setErrosCampo((prev) => {
+      if (!prev[campo]) return prev
+      const next = { ...prev }
+      delete next[campo]
+      return next
+    })
+  }
+
+  /* Mostra os erros e leva o foco ao primeiro campo inválido. */
+  function recusar(erros: ErrosCampo, ordem: CampoContato[]) {
+    setErrosCampo(erros)
+    const primeiro = ordem.find((c) => erros[c])
+    if (primeiro) document.getElementById(`chat-${primeiro}`)?.focus()
+  }
+
   function confirmarIdentificacao(e: React.FormEvent) {
     e.preventDefault()
-    if (nome.trim().length < 2 || empresa.trim().length < 2) return
-    push('user', `${nome.trim()} — ${empresa.trim()}`)
-    setStep('contato')
-    botSays([`Prazer, ${nome.trim().split(' ')[0]}. Onde eu te mando o mapeamento?`])
+    const n = nome.trim()
+    const emp = empresa.trim()
+    const erros: ErrosCampo = {}
+    if (n.length < 2) erros.nome = 'Digite seu nome (pelo menos 2 letras).'
+    else if (!NOME_VALIDO.test(n)) erros.nome = 'Use só letras no nome — sem números ou símbolos.'
+    if (emp.length < 2) erros.empresa = 'Digite o nome da empresa (pelo menos 2 caracteres).'
+    if (Object.keys(erros).length) {
+      recusar(erros, ['nome', 'empresa'])
+      return
+    }
+    setErrosCampo({})
+    push('user', `${n} — ${emp}`)
+    avancar('contato')
+    botSays([`Prazer, ${n.split(' ')[0]}. Onde eu te mando o mapeamento?`])
   }
 
   function confirmarContato(e: React.FormEvent) {
     e.preventDefault()
     const digits = whatsapp.replace(/\D/g, '')
-    if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email.trim())) {
-      setErro('E-mail inválido — confere para eu não mandar no vazio?')
+    const erros: ErrosCampo = {}
+    if (!EMAIL_VALIDO.test(email.trim())) erros.email = 'E-mail inválido — confere para eu não mandar no vazio?'
+    if (digits.length < 10 || digits.length > 15) erros.whatsapp = 'O WhatsApp precisa ter DDD. Ex.: (21) 98878-5170'
+    if (Object.keys(erros).length) {
+      recusar(erros, ['email', 'whatsapp'])
       return
     }
-    if (digits.length < 10 || digits.length > 15) {
-      setErro('O WhatsApp precisa ter DDD. Ex.: (21) 98878-5170')
-      return
-    }
-    setErro('')
+    setErrosCampo({})
     push('user', `${email.trim()} · ${whatsapp.trim()}`)
-    setStep('consentimento')
+    avancar('consentimento')
     botSays(['Só falta você autorizar o uso desses dados para eu te responder. Nada de lista de disparo.'])
   }
 
   async function enviar() {
-    setStep('enviando')
+    avancar('enviando')
     setErro('')
 
+    const origem = searchParams.get('origem') || 'chat_shadow_it'
     const labels = respostas.sintomas
       .map((id) => SINTOMAS.find((s) => s.id === id)?.label)
       .filter(Boolean)
@@ -253,45 +328,63 @@ export function ShadowITChat() {
           utm_source: searchParams.get('utm_source') || '',
           utm_medium: searchParams.get('utm_medium') || '',
           utm_campaign: searchParams.get('utm_campaign') || '',
-          origem: searchParams.get('origem') || 'chat_shadow_it',
+          origem,
         }),
       })
-      const result = await response.json()
+      const result = (await response.json().catch(() => ({}))) as LeadResponse
 
       if (!response.ok) {
+        trackLeadError(response.status, origem)
+        const primeiraIssue = result.issues
+          ? Object.values(result.issues).flatMap((m) => m ?? [])[0]
+          : undefined
         setErro(
           response.status === 429
             ? result.error || 'Muitas tentativas. Tente daqui a alguns minutos.'
-            : result.error || 'Não consegui enviar. Chama no WhatsApp que resolvemos por lá.',
+            : primeiraIssue || result.error || 'Não consegui enviar. Chama no WhatsApp que resolvemos por lá.',
         )
-        setStep('erro')
+        avancar('erro')
         return
       }
 
-      setStep('sucesso')
+      trackLeadConversion({ id: result.id, origem })
+      avancar('sucesso')
       botSays([
         `Recebido, ${nome.trim().split(' ')[0]}. O Jadir responde em até 4 horas úteis, no e-mail e no WhatsApp que você deixou.`,
         'Se for urgente, chama direto no WhatsApp — é o mesmo número que atende o cliente.',
       ])
     } catch {
+      trackLeadError('rede', origem)
       setErro('Erro de conexão. Tente de novo, ou chama no WhatsApp.')
-      setStep('erro')
+      avancar('erro')
     }
   }
 
-  const inputCls =
-    'w-full min-h-[44px] rounded-lg border border-hairline bg-canvas px-4 py-3 text-sm text-ink placeholder:text-ink-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-text'
+  const inputCls = 'field-input bg-canvas py-3 text-sm'
   const chipCls =
-    'min-h-[44px] rounded-lg border border-hairline bg-canvas px-4 py-2.5 text-left text-sm text-ink transition-colors hover:border-accent-text hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-text'
+    'min-h-[44px] rounded-md border border-hairline bg-canvas px-4 py-2.5 text-left text-sm text-ink transition-colors hover:border-accent-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-text'
+
+  const campoProps = (campo: CampoContato) => ({
+    id: `chat-${campo}`,
+    'aria-invalid': Boolean(errosCampo[campo]),
+    'aria-describedby': errosCampo[campo] ? `chat-${campo}-error` : undefined,
+  })
+
+  const erroCampo = (campo: CampoContato) =>
+    errosCampo[campo] ? (
+      <p id={`chat-${campo}-error`} className="field-error mt-0">
+        {errosCampo[campo]}
+      </p>
+    ) : null
 
   return (
-    <div className="surface-card overflow-hidden rounded-2xl">
+    <div className="surface-card overflow-hidden">
       <div className="flex items-center gap-3 border-b border-hairline bg-surface-1/60 px-5 py-4">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 text-accent-text">
           <ShieldAlert className="h-5 w-5" aria-hidden="true" />
         </span>
         <div>
-          <p className="text-sm font-semibold text-white">Diagnóstico de Shadow IT</p>
+          <p className="text-sm font-semibold text-ink">Diagnóstico de Shadow IT</p>
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-ink-subtle">
             Sem formulário · menos de 1 minuto
           </p>
@@ -344,186 +437,192 @@ export function ShadowITChat() {
           className="absolute left-[-9999px] h-0 w-0 opacity-0"
         />
 
-        {step === 'segmento' && (
-          <div className="grid grid-cols-2 gap-2.5">
-            {SEGMENTOS.map((s) => (
-              <button key={s.id} type="button" className={chipCls} onClick={() => escolherSegmento(s.id)}>
-                {s.label}
+        <div ref={controlesRef}>
+          {step === 'segmento' && (
+            <div className="grid grid-cols-2 gap-2.5">
+              {SEGMENTOS.map((s) => (
+                <button key={s.id} type="button" className={chipCls} onClick={() => escolherSegmento(s.id)}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {step === 'sintomas' && (
+            <div className="space-y-2.5">
+              <fieldset>
+                <legend className="sr-only">Sintomas de Shadow IT na sua operação</legend>
+                <div className="grid gap-2.5 sm:grid-cols-2">
+                  {SINTOMAS.map((s) => {
+                    const on = sintomasSel.includes(s.id)
+                    return (
+                      <label
+                        key={s.id}
+                        className={cn(
+                          chipCls,
+                          'flex cursor-pointer items-center gap-3 focus-within:ring-2 focus-within:ring-accent-text',
+                          on && 'border-accent-text bg-accent/10',
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={on}
+                          onChange={() =>
+                            setSintomasSel((prev) =>
+                              prev.includes(s.id) ? prev.filter((x) => x !== s.id) : [...prev, s.id],
+                            )
+                          }
+                          className="h-4 w-4 shrink-0 accent-accent"
+                        />
+                        {s.label}
+                      </label>
+                    )
+                  })}
+                </div>
+              </fieldset>
+              <button type="button" onClick={confirmarSintomas} className="btn-primary btn-block">
+                {sintomasSel.length ? `Continuar com ${sintomasSel.length} marcado(s)` : 'Nenhum desses'}
               </button>
-            ))}
-          </div>
-        )}
+            </div>
+          )}
 
-        {step === 'sintomas' && (
-          <div className="space-y-2.5">
-            <fieldset>
-              <legend className="sr-only">Sintomas de Shadow IT na sua operação</legend>
-              <div className="grid gap-2.5 sm:grid-cols-2">
-                {SINTOMAS.map((s) => {
-                  const on = sintomasSel.includes(s.id)
-                  return (
-                    <label
-                      key={s.id}
-                      className={cn(
-                        chipCls,
-                        'flex cursor-pointer items-center gap-3',
-                        on && 'border-accent-text bg-accent/10 text-white',
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        onChange={() =>
-                          setSintomasSel((prev) =>
-                            prev.includes(s.id) ? prev.filter((x) => x !== s.id) : [...prev, s.id],
-                          )
-                        }
-                        className="h-4 w-4 shrink-0 accent-[#2563EB]"
-                      />
-                      {s.label}
-                    </label>
-                  )
-                })}
-              </div>
-            </fieldset>
-            <button
-              type="button"
-              onClick={confirmarSintomas}
-              className="min-h-[44px] w-full rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              {sintomasSel.length ? `Continuar com ${sintomasSel.length} marcado(s)` : 'Nenhum desses'}
-            </button>
-          </div>
-        )}
+          {step === 'saida' && (
+            <div className="grid gap-2.5">
+              {SAIDA_OPCOES.map((o) => (
+                <button key={o.id} type="button" className={chipCls} onClick={() => escolherSaida(o.id)}>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
 
-        {step === 'saida' && (
-          <div className="grid gap-2.5">
-            {SAIDA_OPCOES.map((o) => (
-              <button key={o.id} type="button" className={chipCls} onClick={() => escolherSaida(o.id)}>
-                {o.label}
+          {step === 'identificacao' && (
+            <form onSubmit={confirmarIdentificacao} className="space-y-2.5" noValidate>
+              <label className="sr-only" htmlFor="chat-nome">Seu nome</label>
+              <input
+                {...campoProps('nome')}
+                className={inputCls}
+                placeholder="Seu nome"
+                autoComplete="name"
+                value={nome}
+                onChange={(e) => {
+                  setNome(e.target.value)
+                  limparErro('nome')
+                }}
+                required
+              />
+              {erroCampo('nome')}
+              <label className="sr-only" htmlFor="chat-empresa">Empresa</label>
+              <input
+                {...campoProps('empresa')}
+                className={inputCls}
+                placeholder="Empresa"
+                autoComplete="organization"
+                value={empresa}
+                onChange={(e) => {
+                  setEmpresa(e.target.value)
+                  limparErro('empresa')
+                }}
+                required
+              />
+              {erroCampo('empresa')}
+              <button type="submit" className="btn-primary btn-block">
+                Quero o mapeamento
               </button>
-            ))}
-          </div>
-        )}
+            </form>
+          )}
 
-        {step === 'identificacao' && (
-          <form onSubmit={confirmarIdentificacao} className="space-y-2.5">
-            <label className="sr-only" htmlFor="chat-nome">Seu nome</label>
-            <input
-              id="chat-nome"
-              className={inputCls}
-              placeholder="Seu nome"
-              autoComplete="name"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-            />
-            <label className="sr-only" htmlFor="chat-empresa">Empresa</label>
-            <input
-              id="chat-empresa"
-              className={inputCls}
-              placeholder="Empresa"
-              autoComplete="organization"
-              value={empresa}
-              onChange={(e) => setEmpresa(e.target.value)}
-              required
-            />
-            <button
-              type="submit"
-              className="min-h-[44px] w-full rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              Quero o mapeamento
-            </button>
-          </form>
-        )}
+          {step === 'contato' && (
+            <form onSubmit={confirmarContato} className="space-y-2.5" noValidate>
+              <label className="sr-only" htmlFor="chat-email">E-mail</label>
+              <input
+                {...campoProps('email')}
+                type="email"
+                inputMode="email"
+                className={inputCls}
+                placeholder="E-mail"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  limparErro('email')
+                }}
+                required
+              />
+              {erroCampo('email')}
+              <label className="sr-only" htmlFor="chat-whatsapp">WhatsApp</label>
+              <input
+                {...campoProps('whatsapp')}
+                type="tel"
+                inputMode="tel"
+                className={inputCls}
+                placeholder="WhatsApp com DDD"
+                autoComplete="tel"
+                value={whatsapp}
+                onChange={(e) => {
+                  setWhatsapp(e.target.value)
+                  limparErro('whatsapp')
+                }}
+                required
+              />
+              {erroCampo('whatsapp')}
+              <button type="submit" className="btn-primary btn-block">
+                Continuar
+              </button>
+            </form>
+          )}
 
-        {step === 'contato' && (
-          <form onSubmit={confirmarContato} className="space-y-2.5">
-            <label className="sr-only" htmlFor="chat-email">E-mail</label>
-            <input
-              id="chat-email"
-              type="email"
-              inputMode="email"
-              className={inputCls}
-              placeholder="E-mail"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <label className="sr-only" htmlFor="chat-whatsapp">WhatsApp</label>
-            <input
-              id="chat-whatsapp"
-              type="tel"
-              inputMode="tel"
-              className={inputCls}
-              placeholder="WhatsApp com DDD"
-              autoComplete="tel"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              required
-            />
-            {erro && (
-              <p role="alert" className="text-xs text-red-400">
+          {step === 'consentimento' && (
+            <div className="space-y-3">
+              <p id="chat-consentimento-texto" className="text-xs leading-relaxed text-ink-subtle">
+                Autorizo a Icardcase a usar meus dados para responder este contato, conforme a{' '}
+                <a href="/politica-privacidade" className="text-accent-text underline underline-offset-2 hover:text-ink">
+                  Política de Privacidade
+                </a>{' '}
+                e a LGPD. Não compartilhamos com terceiros.
+              </p>
+              <button
+                type="button"
+                onClick={enviar}
+                data-autofocus
+                aria-describedby="chat-consentimento-texto"
+                className="btn-primary btn-block"
+              >
+                <Check className="h-4 w-4" aria-hidden="true" />
+                Autorizo e quero receber
+              </button>
+            </div>
+          )}
+
+          {step === 'enviando' && (
+            <p data-autofocus tabIndex={-1} className="text-center text-sm text-ink-subtle focus:outline-none" role="status">
+              Enviando…
+            </p>
+          )}
+
+          {step === 'erro' && (
+            <div className="space-y-3">
+              <p role="alert" className="text-sm text-danger-text">
                 {erro}
               </p>
-            )}
-            <button
-              type="submit"
-              className="min-h-[44px] w-full rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              Continuar
-            </button>
-          </form>
-        )}
+              <button type="button" onClick={enviar} className="btn-secondary btn-block">
+                Tentar de novo
+              </button>
+            </div>
+          )}
 
-        {step === 'consentimento' && (
-          <div className="space-y-3">
-            <p className="text-xs leading-relaxed text-ink-subtle">
-              Autorizo a Icardcase a usar meus dados para responder este contato, conforme a{' '}
-              <a href="/politica-privacidade" className="text-accent-text underline underline-offset-2">
-                Política de Privacidade
-              </a>{' '}
-              e a LGPD. Não compartilhamos com terceiros.
+          {step === 'sucesso' && (
+            <p
+              data-autofocus
+              tabIndex={-1}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-success-text focus:outline-none"
+              role="status"
+            >
+              <Send className="h-4 w-4" aria-hidden="true" />
+              Diagnóstico enviado
             </p>
-            <button
-              type="button"
-              onClick={enviar}
-              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              <Check className="h-4 w-4" aria-hidden="true" />
-              Autorizo e quero receber
-            </button>
-          </div>
-        )}
-
-        {step === 'enviando' && (
-          <p className="text-center text-sm text-ink-subtle" role="status">
-            Enviando…
-          </p>
-        )}
-
-        {step === 'erro' && (
-          <div className="space-y-3">
-            <p role="alert" className="text-sm text-red-400">
-              {erro}
-            </p>
-            <button
-              type="button"
-              onClick={enviar}
-              className="min-h-[44px] w-full rounded-lg border border-hairline px-5 py-3 text-sm font-semibold text-ink hover:border-accent-text"
-            >
-              Tentar de novo
-            </button>
-          </div>
-        )}
-
-        {step === 'sucesso' && (
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400" role="status">
-            <Send className="h-4 w-4" aria-hidden="true" />
-            Diagnóstico enviado
-          </p>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

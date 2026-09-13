@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Script from 'next/script'
+import { GOOGLE_ADS_ID, sendGtagEvent } from '@/lib/analytics'
 
 /**
  * Google tag (gtag.js) + conversão de clique no WhatsApp.
@@ -17,35 +18,36 @@ import Script from 'next/script'
  *     → o "rótulo de conversão" gerado ao criar a ação de conversão
  *       "Contato — clique no WhatsApp" (tipo: clique em link do site).
  *
+ *   NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL → conversão de lead enviado
+ *     (usada por lib/analytics.ts → trackLeadConversion).
+ *
+ * Carregamento em duas partes:
+ *  1. Stub inline (`dataLayer` + `gtag` + config) — custo ~zero, roda cedo.
+ *     Todo gtag() a partir daqui entra na fila do dataLayer.
+ *  2. gtag.js real em `lazyOnload` — ~100KB de terceiro fora do caminho do
+ *     LCP/INP; quando chega, processa a fila. Nenhum evento se perde.
+ *
  * Como funciona a conversão: listener global (delegação) captura QUALQUER
  * clique em link wa.me/api.whatsapp.com do site — landing, header, float —
- * e dispara gtag('event','conversion'). Como os links abrem em nova aba,
- * não é preciso segurar a navegação.
+ * e dispara gtag('event','conversion'). Depende só de window.gtag (do stub).
+ * Como os links abrem em nova aba, não é preciso segurar a navegação.
  */
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[]
-    gtag?: (...args: unknown[]) => void
-  }
-}
-
-const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
 const WHATSAPP_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_WHATSAPP_LABEL
 
 export function GoogleTag() {
   useEffect(() => {
-    if (!ADS_ID || !WHATSAPP_LABEL) return
+    if (!GOOGLE_ADS_ID || !WHATSAPP_LABEL) return
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as Element | null
       const link = target?.closest?.(
         'a[href*="wa.me"], a[href*="api.whatsapp.com"]',
       )
-      if (!link || typeof window.gtag !== 'function') return
+      if (!link) return
 
-      window.gtag('event', 'conversion', {
-        send_to: `${ADS_ID}/${WHATSAPP_LABEL}`,
+      sendGtagEvent('conversion', {
+        send_to: `${GOOGLE_ADS_ID}/${WHATSAPP_LABEL}`,
         value: 1.0,
         currency: 'BRL',
       })
@@ -56,24 +58,24 @@ export function GoogleTag() {
     return () => document.removeEventListener('click', handleClick, true)
   }, [])
 
-  if (!ADS_ID) return null
+  if (!GOOGLE_ADS_ID) return null
 
   return (
     <>
-      <Script
-        id="google-tag-src"
-        src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`}
-        strategy="afterInteractive"
-      />
       <Script id="google-tag-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
           gtag('js', new Date());
-          gtag('config', '${ADS_ID}');
+          gtag('config', '${GOOGLE_ADS_ID}');
         `}
       </Script>
+      <Script
+        id="google-tag-src"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+        strategy="lazyOnload"
+      />
     </>
   )
 }

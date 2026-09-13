@@ -1,8 +1,6 @@
-'use client'
-
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
 import { Code2, Network, Headphones, ShieldCheck, Lightbulb } from 'lucide-react'
+import { Reveal } from '@/components/Reveal'
 
 const services = [
   {
@@ -43,28 +41,8 @@ const services = [
 ]
 
 export function Services() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = sectionRef.current
-    if (!node) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -80px 0px' },
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-
   return (
     <section
-      ref={sectionRef}
       id="solucoes"
       className="relative overflow-hidden bg-canvas section-y border-t border-hairline"
     >
@@ -87,12 +65,12 @@ export function Services() {
         {/* Cards */}
         <ul className="grid grid-cols-1 gap-px bg-hairline border border-hairline rounded-xl overflow-hidden sm:grid-cols-2 lg:grid-cols-5">
           {services.map((service, index) => (
-            <li
+            <Reveal
               key={service.title}
-              className={`relative group bg-canvas transition-all duration-[750ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
-              }`}
-              style={{ transitionDelay: `${index * 90}ms` }}
+              as="li"
+              variant="rise"
+              delay={index * 90}
+              className="relative group bg-canvas"
             >
               <Link
                 href={service.href}
@@ -104,7 +82,7 @@ export function Services() {
                 />
 
                 <div className="flex items-center justify-between mb-8">
-                  <span className="font-mono text-[0.7rem] tracking-[0.12em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent">
+                  <span className="font-mono text-[0.7rem] tracking-[0.12em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent-text">
                     {service.num}
                   </span>
                   <span className="relative inline-flex">
@@ -114,7 +92,7 @@ export function Services() {
                     />
                     <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-hairline-strong bg-canvas transition-all duration-500 group-hover:border-accent group-hover:bg-accent/10">
                       <service.icon
-                        className="h-4 w-4 text-ink-subtle transition-all duration-500 group-hover:text-accent group-hover:scale-110"
+                        className="h-4 w-4 text-ink-subtle transition-all duration-500 group-hover:text-accent-text group-hover:scale-110"
                         strokeWidth={1.6}
                         aria-hidden="true"
                       />
@@ -129,7 +107,8 @@ export function Services() {
                   {service.description}
                 </p>
 
-                <div className="mt-6 flex items-center gap-1 text-xs font-mono uppercase tracking-[0.1em] text-ink-tertiary opacity-0 -translate-y-1 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 group-hover:text-accent">
+                {/* Revela no hover e também no foco de teclado */}
+                <div className="mt-6 flex items-center gap-1 text-xs font-mono uppercase tracking-[0.1em] text-ink-tertiary opacity-0 -translate-y-1 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 group-hover:text-accent-text group-focus-visible:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:text-accent-text">
                   <span>Ver detalhes</span>
                   <svg
                     width="12"
@@ -145,7 +124,7 @@ export function Services() {
                   </svg>
                 </div>
               </Link>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

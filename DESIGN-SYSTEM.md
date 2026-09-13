@@ -1,6 +1,6 @@
 # Design System · Icardcase Site
 
-> Fonte de verdade dos tokens: [tailwind.config.ts](tailwind.config.ts) (cores, tipografia, animação) e [app/globals.css](app/globals.css) (classes utilitárias, `.btn-*`, `.surface-card`).
+> Fonte de verdade dos tokens: [tailwind.config.ts](tailwind.config.ts) (cores, tipografia, animação) e [app/globals.css](app/globals.css) (classes utilitárias, `.btn-*`, `.field-input`, `.surface-card`, `.reveal`).
 > Mudou um token? Mude lá, não aqui — e atualize este documento.
 
 Estética: **dark navy, Linear-style**. Fundo profundo, superfícies em escada de navy, texto quase branco, accent azul usado com **parcimônia**. `color-scheme: dark` global.
@@ -19,9 +19,10 @@ Estética: **dark navy, Linear-style**. Fundo profundo, superfícies em escada d
 ### Bordas (hairlines)
 | Token | Valor | Uso |
 |---|---|---|
-| `hairline` | `#1E3168` | Borda 1px padrão |
+| `hairline` | `#1E3168` | Borda 1px padrão (decorativa — 1.6:1, não serve para limite de controle) |
 | `hairline-strong` | `#2A3F75` | Borda em hover |
 | `hairline-tertiary` | `#34487F` | Borda terciária |
+| `hairline-input` | `#64748B` | Borda de campo de formulário — 3.36:1 no `surface-1` (WCAG 1.4.11 pede 3:1) |
 
 ### Texto (ink)
 | Token | Valor | Uso | Contraste no `canvas` |
@@ -31,45 +32,62 @@ Estética: **dark navy, Linear-style**. Fundo profundo, superfícies em escada d
 | `ink-subtle` | `#AAB4C4` | Terciário (calibrado p/ AA) | AA |
 | `ink-tertiary` | `#8D99AB` | Quaternário, labels mono (calibrado p/ AA) | AA |
 
-### Accent (uso escasso — só CTA, foco, link)
-| Token | Valor | Uso |
-|---|---|---|
-| `accent` (DEFAULT) | `#2563EB` | CTA primário, foco |
-| `accent-hover` | `#3B82F6` | Hover (mais claro), kickers |
-| `accent-focus` | `#1D4FD8` | Focus ring |
+### Accent (uso escasso — CTA, foco, link)
+| Token | Valor | Uso | Como texto |
+|---|---|---|---|
+| `accent` (DEFAULT) | `#2563EB` | **Preenchimento**: `bg-accent` do CTA, bordas, `bg-accent/10` de badge, linhas decorativas | **Não use como texto** — 3.1:1 no canvas, reprova AA |
+| `accent-hover` | `#3B82F6` | Hover de fundo do `.btn-primary`; texto do `.section-kicker` | 5.2:1 no canvas, **4.3:1 no surface-1** (reprova em card) |
+| `accent-focus` | `#1D4FD8` | Reservado | — |
+| `accent-text` | `#60A5FA` | **Toda tipografia e ícone azul**: links, hover de título, números mono, ícones lucide | 7.55:1 canvas · 6.29 surface-1 · 5.65 surface-2 |
 
-> Existem tokens `brand.*`, `surface.DEFAULT`, `ink.400/900` de **backward-compat** — não use em código novo; prefira a escada acima.
-> **Regra de contraste:** pares texto/fundo já foram calibrados pra WCAG AA (4.5:1). Não use `ink-subtle`/`ink-tertiary` sobre `surface-3`/`surface-4` sem checar.
+**Regra:** `accent` pinta, `accent-text` escreve. Hover de título em card (`group-hover:text-accent-text`), link inline, número de passo, ícone — sempre `accent-text`. Dentro de card (`surface-1`/`surface-2`), troque o `.section-kicker` por `section-kicker text-accent-text`.
+
+### Feedback semântico
+Mesmo contrato do accent: `DEFAULT` para preenchimento/borda (com alpha), `text` para tipografia/ícone.
+
+| Token | DEFAULT | `text` | Uso |
+|---|---|---|---|
+| `danger` | `#EF4444` | `#F87171` | Erro de formulário (`text-danger-text`, `border-danger/40 bg-danger/10`), risco alto |
+| `warning` | `#F59E0B` | `#FBBF24` | Alerta, risco médio |
+| `success` | `#10B981` | `#34D399` | Sucesso, status "integrado" |
+
+Exemplo: `<span className="rounded-md bg-success/10 px-3 py-1 text-xs text-success-text">Integrado</span>`. **Não use `red-*`/`amber-*`/`emerald-*` crus.**
+
+> Tokens backward-compat (`surface.DEFAULT` claro, `muted`, `brand.*`, `ink.100/400/900/50`) e fontSize `hero`/`h2`/`subhead`/`eyebrow` foram **removidos** em 09/2026 (zero uso). `bg-surface` não existe mais — use a escada `surface-1…4`.
+> **Regra de contraste:** pares texto/fundo calibrados pra WCAG AA (4.5:1). Não use `ink-subtle`/`ink-tertiary` sobre `surface-3`/`surface-4` sem checar.
+> Exceção deliberada: o verde do WhatsApp (`#25D366`) no botão flutuante é decisão de marca, fora dos tokens.
 
 ## Tipografia
 
-Famílias (via `next/font`, self-hosted): **Inter** (`--font-inter`, sans + display) e **JetBrains Mono** (`--font-mono`). Headings são Inter 600 com tracking negativo agressivo (Linear-style, definido em `globals.css`).
+Famílias (via `next/font`, self-hosted): **Inter** (`--font-inter`, sans + display) e **JetBrains Mono** (`--font-mono`). Headings são Inter 600 com tracking negativo agressivo (Linear-style).
 
-| Papel | Classe | Tamanho | Peso | Line-height |
-|---|---|---|---|---|
-| Display XL (hero) | `text-display-xl` | `clamp(2.5rem, 6.5vw, 5rem)` | 600 | 1.05 |
-| Display LG (h1) | `text-display-lg` | `clamp(2rem, 4.5vw, 3.5rem)` | 600 | 1.10 |
-| Display MD (h2) | `text-display-md` | `clamp(1.75rem, 3.2vw, 2.5rem)` | 600 | 1.15 |
-| Headline | `text-headline` | `clamp(1.5rem, 2.2vw, 1.75rem)` | 600 | 1.20 |
-| Card title | `text-card-title` | `1.375rem` | 500 | 1.25 |
-| Body LG | `text-body-lg` | `1.125rem` | 400 | 1.50 |
-| Eyebrow | `text-eyebrow` / `.eyebrow` | `0.8125rem` | 500 | tracking +0.05em |
+| Papel | Classe | Tamanho | Peso | Line-height | Tracking |
+|---|---|---|---|---|---|
+| Display XL (hero h1) | `text-display-xl` | `clamp(3.25rem, 9vw, 6.5rem)` | 600 | 1.0 | -0.045em |
+| Display LG (h2 de seção) | `text-display-lg` | `clamp(2.25rem, 5vw, 4.25rem)` | 600 | 1.05 | -0.038em |
+| Display MD | `text-display-md` | `clamp(1.875rem, 3.4vw, 2.75rem)` | 600 | 1.12 | -0.03em |
+| Headline | `text-headline` | `clamp(1.5rem, 2.4vw, 1.875rem)` | 600 | 1.18 | -0.024em |
+| Card title | `text-card-title` | `1.375rem` | 500 | 1.25 | -0.015em |
+| Body LG | `text-body-lg` | `1.125rem` | 400 | 1.50 | -0.004em |
 
-- **Kicker/eyebrow:** mono, uppercase, `tracking-[0.12em]`. Classes prontas: `.eyebrow` (traço antes, texto `ink-subtle`) e `.section-kicker` (texto `accent-hover`).
-- **Artigos** (cases/insights): use a classe `.prose-icardcase` (estiliza h2/h3/p/ul/a/blockquote/code no tom do site).
+As quatro classes display/headline têm `overflow-wrap: break-word` em `globals.css` (palavras longas do pt-BR não estouram 320px).
+
+- **Kicker/eyebrow:** mono, uppercase, `0.75rem`, `tracking-[0.12em]`. `.eyebrow` (traço decorativo antes, texto `ink-subtle`) e `.section-kicker` (texto `accent-hover` — sobre card use `text-accent-text` junto).
+- **Artigos** (cases/insights): `.prose-icardcase` (h2/h3/p/ul/a/blockquote/code; links em `accent-text`).
 
 ## Espaçamentos
 
-Escala Tailwind padrão (4px base): `1=4px, 2=8px, 3=12px, 4=16px, 5=20px, 6=24px, 8=32px, 10=40px, 12=48px, 16=64px…`. **Só use valores da escala.** Ritmo vertical de seção: classe `.section-y` (`py-24 sm:py-32 lg:py-40`).
+Escala Tailwind padrão (4px base): `1=4px, 2=8px, 3=12px, 4=16px, 5=20px, 6=24px, 8=32px, 10=40px, 12=48px, 16=64px…`. **Só use valores da escala.** Ritmo vertical de seção: `.section-y` (`py-24 sm:py-32 lg:py-40`).
 
 ## Border radius
 
 | Valor | Onde |
 |---|---|
-| `rounded-md` (6px) | Botões (`.btn-*`) — sem pill, spec Linear |
-| `rounded-lg` (8px) | Cards de conteúdo em landing |
-| `rounded-xl` (12px) | `.surface-card` |
-| `rounded-full` | Badges de ícone, `pulse-ring` |
+| `rounded-md` (6px) | Botões (`.btn-*`), inputs (`.field-input`), chips, badges de status — sem pill, spec Linear |
+| `rounded-lg` (8px) | Cards de conteúdo em landing, quadrados de ícone |
+| `rounded-xl` (12px) | `.surface-card` (já embutido — não sobrescreva com `2xl`/`3xl`) |
+| `rounded-full` | Badge circular de ícone, `pulse-ring`, botão flutuante |
+| `rounded-2xl` | Só balão de mensagem do `ShadowITChat` (idioma de chat) |
 
 ## Sombras / elevação
 
@@ -85,31 +103,57 @@ Breakpoints Tailwind: `sm 640` · `md 768` · `lg 1024` · `xl 1280`. **Mobile-f
 | tablet | 640–1024px | `px-8` |
 | desktop | > 1024px | `px-12`, `max-w-content` (1280px) |
 
-Container: classe `.container-content` (`mx-auto w-full max-w-content px-5 sm:px-8 lg:px-12`).
+Container: `.container-content` (`mx-auto w-full max-w-content px-5 sm:px-8 lg:px-12`).
 
 ## Componentes visuais
 
 ### Botões
-Não há componente React `<Button>` — botões são **classes utilitárias** aplicadas a `<a>`/`<Link>`/`<button>`.
+Não há componente React `<Button>` — botões são **classes** aplicadas a `<a>`/`<Link>`/`<button>`. CTA de WhatsApp com telemetria: `WhatsAppButton` (usa as mesmas classes).
 
 | Classe | Fundo | Texto | Borda | Quando usar |
 |---|---|---|---|---|
-| `.btn-primary` | `accent` | branco | — | Ação principal — uma por tela |
-| `.btn-secondary` | `surface-1` | `ink` | `hairline` | Ação alternativa |
+| `.btn-primary` | `accent` → `accent-hover` | branco | — | Ação principal — uma por tela |
+| `.btn-secondary` | `surface-1` → `surface-2` | `ink` | `hairline` | Ação alternativa |
 | `.btn-ghost-dark` | transparente | `ink` | `hairline` | Terciária sobre fundo escuro |
 | `.btn-ghost-light` | transparente | branco | branco/20 | Sobre imagem/fundo claro |
 
-Todas têm `min-h-[44px]` (área de toque). Exemplo real:
+**Modificadores** (combinam com qualquer `.btn-*`):
+
+| Classe | Efeito |
+|---|---|
+| `.btn-lg` | `min-h-[52px] px-8 py-3.5 text-base` — CTA final de landing, submit de formulário |
+| `.btn-block` | `w-full` — botões de chat, menu mobile. Utilitário vence: `btn-block sm:w-auto` |
+
+Base: `min-h-[44px]`, `rounded-md`, `text-sm font-medium`, `gap-2`.
+
 ```tsx
-<a href={buildWhatsAppUrl()} className="btn-primary">Conversar</a>
 <a href="#como-funciona" className="btn-secondary">Ver o que está incluído</a>
+<button type="submit" aria-disabled={enviando} className="btn-primary btn-lg btn-block sm:w-auto">Enviar</button>
+<WhatsAppButton origem="raiox_final" message={TEXTO}>Agendar meu Raio-X</WhatsAppButton>
 ```
 
+**Disabled:** `:disabled` e `[aria-disabled='true']` estão estilizados — `.btn-primary` vira `surface-2` + `ink-subtle` sem glow; os demais ficam `opacity-60`; hover anulado, `cursor-not-allowed`. Prefira **`aria-disabled`** em botão que já tem foco (ex.: submit durante o envio) e bloqueie no handler — `disabled` tira o elemento da tabulação e o foco cai no `body`. Não desabilite submit para "forçar" preenchimento: valide ao enviar e explique (ver `LeadForm` + LGPD).
+
 ### Inputs
-Estilizados inline no [components/LeadForm.tsx](components/LeadForm.tsx) com tokens dark: `bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary`. Estados: default, focus (`focus-visible` global), error (`role="alert"` + `aria-live`). **Todo input tem `<label htmlFor>`** — placeholder não é label. `<select>` nativo tem regra global pra `<option>` (fundo `#081F4D`) em `globals.css`.
+Classe **`.field-input`** em `input`, `select` e `textarea`:
+- `bg-surface-1`, borda `hairline-input` (3.36:1), `rounded-md`, `min-h-[44px]`, placeholder `ink-tertiary`; hover clareia a borda.
+- **focus-visible:** borda + outline 2px `accent-text`, offset 2px. Nunca adicione `focus:outline-none`.
+- **`aria-invalid="true"`:** borda `danger-text`.
+- **disabled:** `opacity-60`, `cursor-not-allowed`.
+- Sobre fundo `surface-1` (ex.: chat), adicione `bg-canvas` para destacar o campo.
+
+Mensagem de erro: `<p id="campo-error" className="field-error">` ligada ao campo por `aria-describedby` + `aria-invalid`. **Todo input tem `<label htmlFor>`** — placeholder não é label. `<select>` nativo tem regra global para `<option>` (tokens `surface-1`/`surface-4`).
+
+```tsx
+<input id="email" className="field-input" aria-invalid={!!erro} aria-describedby={erro ? 'email-error' : undefined} />
+{erro && <p id="email-error" className="field-error">{erro}</p>}
+```
 
 ### Cards
-Classe base `.surface-card` (`rounded-xl border border-hairline bg-surface-1`, hover sobe pra `surface-2`/`hairline-strong`). Adicione `.card-glow` para a borda-gradiente + spot no hover (efeito Linear). Ex.: `CasesSection`, cards de dores em `/raio-x-de-ti`.
+`.surface-card` (`rounded-xl border border-hairline bg-surface-1`, hover sobe pra `surface-2`/`hairline-strong`). `.card-glow` adiciona borda-gradiente + spot no hover (efeito Linear). Ex.: `CasesSection`, cards de risco em `/shadow-it`.
+
+### Logo
+`public/logo-icardcase-mark.png` — **PNG transparente 50×72** (2x do exibido a 25×36, `h-9`). Servido `unoptimized` e sem `priority` (não é LCP). A versão quadrada com fundo creme (`logo-icardcase.png`) fica para ícones/JSON-LD. Texto "icardcase" em `text-ink` (variant `dark`) ou `text-surface-1` (`light`).
 
 ### Não há Modais nem Tabelas de dados no projeto (site institucional).
 
@@ -119,22 +163,29 @@ Classe base `.surface-card` (`rounded-xl border border-hairline bg-surface-1`, h
 |---|---|
 | hover | Sobe uma superfície (`surface-1→2`) ou clareia accent; transições 200–500ms |
 | active | Herda do hover |
-| focus-visible | Outline accent global (`*:focus-visible` no `globals.css`) — **nunca remover sem substituir** |
-| disabled | `<option value="" disabled>`; botões via `aria-disabled` + opacidade |
-| loading | `LeadForm` troca ícone por `<Loader2>` girando e bloqueia re-submit |
+| focus-visible | Global `*:focus-visible`: **outline 2px sólido `#7CA8FF`, offset 3px** (7.4:1 no canvas). `.btn-primary`: outline **branco** 2px offset 2px (vale sobre o próprio azul). `.field-input`: outline `accent-text` offset 2px. Chips do chat: `ring-2 ring-accent-text`. **Nunca remover sem substituir.** |
+| disabled | `.btn-*:disabled` / `[aria-disabled=true]`; `.field-input:disabled`; `<option value="" disabled>` |
+| invalid | `.field-input[aria-invalid=true]` + `.field-error` via `aria-describedby`; foco vai ao primeiro campo inválido |
+| loading | `aria-disabled` no botão + `<Loader2>` girando; `aria-busy` no form |
 
 ## Ícones
 
-Biblioteca: **lucide-react** (`import { Code2 } from 'lucide-react'`). Tamanho padrão `h-4 w-4`/`h-5 w-5`, `strokeWidth={1.6}` nos ícones de serviço. Cor via token (`text-ink-subtle`, `text-accent`). Ícone decorativo → `aria-hidden`; ícone sozinho com significado → `aria-label`. O `Logo` é SVG inline próprio ([components/Logo.tsx](components/Logo.tsx)).
+Biblioteca: **lucide-react** (`import { Code2 } from 'lucide-react'`). Tamanho padrão `h-4 w-4`/`h-5 w-5`, `strokeWidth={1.6}` nos ícones de serviço. Cor via token: `text-ink-subtle` em repouso, **`text-accent-text`** para ícone azul (nunca `text-accent`). Ícone decorativo → `aria-hidden`; ícone sozinho com significado → `aria-label`. SVG inline usa `stroke="currentColor"` + classe de token, nunca hex.
 
 ## Animação
 
-Keyframes no `tailwind.config.ts`: `fade-up`, `fade-in`, `float`, `pulse-ring`, `gradient-shift`. Efeitos custom no `globals.css`: `.aurora` (glows accent driftando no Hero), `.card-glow`, `.grain-overlay`, `.link-underline`, `.edge-highlight`. **`prefers-reduced-motion` é respeitado globalmente** — animação nova não precisa reimplementar isso, mas count-ups via JS (`AnimatedCounter`) checam a media query manualmente.
+Keyframes no `tailwind.config.ts`: `enter` (entrada do Hero) e `pulse-ring`. Classe `animate-enter` = `enter 0.6s … both`; atraso com `[animation-delay:120ms]`.
+
+- **Nada de conteúdo escondido no HTML do servidor.** Conteúdo acima da dobra (h1, subtítulo) não anima. Entradas do Hero são **CSS puro** com `fill-mode: both` — rodam sem JS.
+- **Entrada ao rolar:** componente `Reveal` (ver COMPONENTS.md) + classes `.reveal` / `.reveal-rise` em `globals.css`. Estado base visível; só esconde (`data-reveal="pending"`) o que está abaixo da dobra depois de hidratar. **Não recrie hooks de IntersectionObserver por seção.**
+- `.aurora`: dois glows em radial-gradient **sem `filter: blur`** (custo de rasterização); drift só a partir de `md`.
+- Outros efeitos em `globals.css`: `.card-glow`, `.grain-overlay`, `.link-underline`, `.edge-highlight`, `.hero-grid`.
+- **`prefers-reduced-motion`** é respeitado globalmente: duração **e delay** de animação/transição zerados. Exceções que precisam checar a media query no JS: count-up (`AnimatedCounter`), `Reveal`, parallax e **SMIL** (`<animate>`/`<animateMotion>` ignoram CSS — o `HeroBackdrop` só os monta sem reduced-motion), pausas de digitação do `ShadowITChat`.
 
 ## Responsividade
 
-- **Mobile-first**, sempre. Escreva o estilo base pra mobile e suba com `sm:`/`lg:`.
-- Área de toque mínima **44×44px** (as classes `.btn-*`/`.nav-link` garantem).
+- **Mobile-first**, sempre. Estilo base pra mobile, sobe com `sm:`/`lg:`.
+- Área de toque mínima **44×44px** (`.btn-*`, `.nav-link`, `.field-input` garantem; botão de ícone usa `h-11 w-11`).
 - Imagens com `max-width:100%` implícito via `next/image` + `width`/`height`.
 
 ## Criando um componente novo
@@ -142,6 +193,6 @@ Keyframes no `tailwind.config.ts`: `fade-up`, `fade-in`, `float`, `pulse-ring`, 
 1. Existe algo parecido? Veja [COMPONENTS.md](COMPONENTS.md).
 2. Use os tokens acima — **nenhum valor hardcoded** (nem hex, nem px fora da escala).
 3. Cubra os estados: default, hover, `focus-visible`, disabled, loading.
-4. Teste em mobile (< 640px).
-5. Cheque contraste (AA).
+4. Teste em mobile (< 640px) e sem JS (o conteúdo aparece?).
+5. Cheque contraste (AA) — texto azul é `accent-text`.
 6. Documente aqui (se for visual reutilizável) e em COMPONENTS.md.

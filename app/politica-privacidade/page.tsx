@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
+import { buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Política de Privacidade',
   description: 'Política de Privacidade da Icardcase, em conformidade com a LGPD (Lei 13.709/2018).',
-  alternates: { canonical: '/politica-privacidade' },
-}
+  path: '/politica-privacidade',
+})
 
 export default function PoliticaPrivacidadePage() {
-  const updatedAt = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+  const updatedAt = '03 de setembro de 2026' // data fixa: último commit do texto (antes new Date() mudava a cada build)
 
   return (
     <section className="section-y">

@@ -15,25 +15,29 @@ import {
 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { ShadowITChat } from '@/components/ShadowITChat'
-import { COMPANY, buildWhatsAppUrl } from '@/lib/constants'
+import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { COMPANY, yearsInBusiness } from '@/lib/constants'
+import { breadcrumbSchema, buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Shadow IT: elimine as ferramentas paralelas da sua operação',
+export const metadata: Metadata = buildMetadata({
+  title: 'Shadow IT: elimine ferramentas paralelas',
   description:
-    'Planilhas soltas, formulários gratuitos e controles em WhatsApp expõem dados de clientes e geram retrabalho. A Icardcase unifica tudo em um ambiente próprio, integrado ao seu ERP. Diagnóstico gratuito em 1 minuto.',
-  alternates: { canonical: '/shadow-it' },
-}
+    'Shadow IT: planilhas soltas, formulários gratuitos e controles em WhatsApp expõem dados de clientes. Unifique tudo, integrado ao ERP. Diagnóstico grátis.',
+  path: '/shadow-it',
+})
+
+const breadcrumb = breadcrumbSchema([{ name: 'Shadow IT', path: '/shadow-it' }])
 
 const RISCOS = [
   {
     icon: FileSpreadsheet,
-    tone: 'text-red-400 bg-red-500/10',
+    tone: 'text-danger-text bg-danger/10',
     title: 'Planilhas paralelas',
     body: 'Controles cruciais isolados no Excel ou no Drive pessoal de um colaborador, sem versão oficial, sem histórico e sem backup.',
   },
   {
     icon: LockKeyholeOpen,
-    tone: 'text-amber-400 bg-amber-500/10',
+    tone: 'text-warning-text bg-warning/10',
     title: 'Dado de cliente exposto',
     body: 'Informação confidencial de terceiro em conta pessoal de e-mail, Trello ou Notion. Na LGPD a responsabilidade pelo tratamento continua sendo sua.',
   },
@@ -75,12 +79,13 @@ const PROVAS = [
   { valor: '94', unidade: 'tabelas', ctx: 'ERP sob medida em produção na indústria química (SYSPERSHY)' },
   { valor: '60', unidade: 'migrações', ctx: 'evolução de schema versionada, sem perder dado' },
   { valor: 'Zero', unidade: 'downtime', ctx: 'migração de Visual FoxPro para Supabase sem parar a receita (Prossiga)' },
-  { valor: '14', unidade: 'anos', ctx: `construindo sistemas críticos desde ${COMPANY.founded}` },
+  { valor: String(yearsInBusiness()), unidade: 'anos', ctx: `construindo sistemas críticos desde ${COMPANY.founded}` },
 ]
 
 export default function ShadowITPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/80 backdrop-blur-xl">
         <div className="container-content flex h-20 items-center justify-between">
           <Link href="/" aria-label="Página inicial da Icardcase">
@@ -91,10 +96,7 @@ export default function ShadowITPage() {
             <a href="#plataforma" className="transition-colors hover:text-accent-text">A plataforma</a>
             <a href="#provas" className="transition-colors hover:text-accent-text">Provas</a>
           </nav>
-          <a
-            href="#diagnostico"
-            className="inline-flex min-h-[44px] items-center rounded-full bg-accent px-5 text-sm font-bold text-white transition-opacity hover:opacity-90"
-          >
+          <a href="#diagnostico" className="btn-primary">
             Diagnóstico grátis
           </a>
         </div>
@@ -107,9 +109,8 @@ export default function ShadowITPage() {
         <div className="container-content relative z-10">
           <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent-text">
-                Shadow IT
-              </span>
+              {/* Kicker do DS no lugar da pílula — mesma assinatura das outras landings */}
+              <span className="section-kicker text-accent-text">Shadow IT</span>
 
               <h1 className="mt-7 text-display-lg text-ink">
                 Seu ERP não resolve tudo. Sua equipe resolveu <span className="text-accent-text">na planilha.</span>
@@ -141,7 +142,7 @@ export default function ShadowITPage() {
             <div id="diagnostico" className="scroll-mt-24">
               <Suspense
                 fallback={
-                  <div className="surface-card h-[32rem] rounded-2xl" aria-hidden="true" />
+                  <div className="surface-card h-[32rem]" aria-hidden="true" />
                 }
               >
                 <ShadowITChat />
@@ -168,11 +169,11 @@ export default function ShadowITPage() {
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {RISCOS.map(({ icon: Icon, tone, title, body }) => (
-              <article key={title} className="surface-card card-glow rounded-2xl p-6">
-                <span className={`mb-6 flex h-12 w-12 items-center justify-center rounded-xl ${tone}`}>
+              <article key={title} className="surface-card card-glow p-6">
+                <span className={`mb-6 flex h-12 w-12 items-center justify-center rounded-lg ${tone}`}>
                   <Icon className="h-6 w-6" aria-hidden="true" />
                 </span>
-                <h3 className="text-lg font-bold text-ink">{title}</h3>
+                <h3 className="text-lg font-semibold text-ink">{title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-subtle">{body}</p>
               </article>
             ))}
@@ -210,12 +211,12 @@ export default function ShadowITPage() {
           </div>
 
           {/* Os três módulos, nomeados como no diagrama de referência */}
-          <div className="surface-card rounded-3xl p-8">
+          <div className="surface-card p-8">
             <div className="flex items-center justify-between border-b border-hairline pb-4">
               <span className="font-mono text-xs uppercase tracking-[0.1em] text-ink-subtle">
                 Ecossistema unificado
               </span>
-              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+              <span className="rounded-md bg-success/10 px-3 py-1 text-xs font-semibold text-success-text">
                 Integrado
               </span>
             </div>
@@ -254,7 +255,7 @@ export default function ShadowITPage() {
               ['Prossiga', 'Migração de Visual FoxPro para Supabase sem parar a receita do cliente.'],
               ['NF SaaS', 'Plataforma fiscal multi-tenant NF-e/NFC-e/NFS-e com integração SEFAZ.'],
             ].map(([nome, desc]) => (
-              <article key={nome} className="surface-card card-glow rounded-2xl p-6">
+              <article key={nome} className="surface-card card-glow p-6">
                 <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-accent-text">{nome}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-subtle">{desc}</p>
               </article>
@@ -272,7 +273,7 @@ export default function ShadowITPage() {
       {/* ─── Contato ─────────────────────────────────────────────────────── */}
       <section className="py-24">
         <div className="container-content">
-          <div className="surface-card rounded-3xl border-accent/30 p-8 text-center sm:p-12">
+          <div className="surface-card border-accent/30 p-8 text-center sm:p-12">
             <h2 className="text-display-md text-ink">Prefere falar com uma pessoa?</h2>
             <p className="mx-auto mt-5 max-w-[52ch] text-ink-subtle">
               Quem responde é o Jadir, engenheiro e fundador — não um vendedor, não um bot de fila.
@@ -281,7 +282,7 @@ export default function ShadowITPage() {
             <div className="mx-auto mt-10 grid max-w-xl gap-4 text-left sm:grid-cols-2">
               <a
                 href={`mailto:${COMPANY.contact.email}`}
-                className="flex min-h-[44px] items-center gap-4 rounded-xl border border-hairline bg-canvas p-4 transition-colors hover:border-accent-text"
+                className="flex min-h-[44px] items-center gap-4 rounded-lg border border-hairline bg-canvas p-4 transition-colors hover:border-accent-text"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent-text">
                   <Mail className="h-5 w-5" aria-hidden="true" />
@@ -292,31 +293,25 @@ export default function ShadowITPage() {
                 </span>
               </a>
 
-              <a
-                href={buildWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-[44px] items-center gap-4 rounded-xl border border-hairline bg-canvas p-4 transition-colors hover:border-emerald-400"
+              <WhatsAppButton
+                origem="shadowit_contato"
+                variant="unstyled"
+                className="flex min-h-[44px] items-center gap-4 rounded-lg border border-hairline bg-canvas p-4 transition-colors hover:border-success-text"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success-text">
                   <Phone className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <span>
                   <span className="block font-mono text-[0.65rem] uppercase tracking-[0.1em] text-ink-subtle">WhatsApp</span>
                   <span className="block text-sm font-semibold text-ink">{COMPANY.contact.phone}</span>
                 </span>
-              </a>
+              </WhatsAppButton>
             </div>
 
-            <a
-              href={buildWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-10 inline-flex min-h-[44px] items-center gap-3 rounded-xl bg-accent px-8 py-4 text-base font-bold text-white transition-opacity hover:opacity-90"
-            >
+            <WhatsAppButton origem="shadowit_final" className="btn-lg mt-10">
               <MessageSquare className="h-5 w-5" aria-hidden="true" />
               Falar direto com o engenheiro
-            </a>
+            </WhatsAppButton>
           </div>
         </div>
       </section>

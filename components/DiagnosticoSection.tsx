@@ -1,6 +1,5 @@
-import { Suspense } from 'react'
 import Link from 'next/link'
-import { ShadowITChat } from '@/components/ShadowITChat'
+import { LazyShadowITChat } from '@/components/LazyShadowITChat'
 
 /**
  * Entra logo depois de DataUnification, de propósito.
@@ -56,11 +55,8 @@ export function DiagnosticoSection() {
           </div>
 
           <div className="lg:col-span-7">
-            <Suspense
-              fallback={<div className="surface-card h-[34rem] rounded-xl" aria-hidden="true" />}
-            >
-              <ShadowITChat />
-            </Suspense>
+            {/* Abaixo da dobra: o JS do chat só baixa quando a seção se aproxima */}
+            <LazyShadowITChat />
           </div>
         </div>
       </div>

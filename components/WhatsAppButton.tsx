@@ -4,7 +4,9 @@ import { useCallback, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { buildWhatsAppUrl } from '@/lib/constants'
 
-type Variant = 'float' | 'primary' | 'ghost-dark'
+// 'unstyled': sem classe .btn-* — para CTAs com layout próprio (ex.: card de
+// contato em /shadow-it) que ainda precisam da telemetria de clique.
+type Variant = 'float' | 'primary' | 'ghost-dark' | 'unstyled'
 
 interface WhatsAppButtonProps {
   origem: string
@@ -56,7 +58,7 @@ export function WhatsAppButton({
     )
   }
 
-  const base = variant === 'primary' ? 'btn-primary' : 'btn-ghost-dark'
+  const base = variant === 'primary' ? 'btn-primary' : variant === 'ghost-dark' ? 'btn-ghost-dark' : undefined
   return (
     <a
       href={href}

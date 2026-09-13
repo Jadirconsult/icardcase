@@ -7,6 +7,8 @@ import { Footer } from '@/components/Footer'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
 import { ConditionalChrome } from '@/components/ConditionalChrome'
 import { GoogleTag } from '@/components/GoogleTag'
+import { SITE } from '@/lib/constants'
+import { DEFAULT_OG_IMAGE, HOME_DESCRIPTION, HOME_TITLE, organizationSchema } from '@/lib/seo'
 import './globals.css'
 
 const inter = Inter({
@@ -14,22 +16,24 @@ const inter = Inter({
   variable: '--font-inter',
   display: 'swap',
 })
+// Mono só aparece em rótulos pequenos: sem preload, não disputa banda com o
+// Inter e o LCP no carregamento inicial.
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  preload: false,
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.icardcase.com.br'
+const siteUrl = SITE.url
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Icardcase — Soluções web e mobile sob medida · Atendimento nacional',
+    default: HOME_TITLE,
     template: '%s · Icardcase',
   },
-  description:
-    'Desenvolvimento de sistemas web e mobile sob medida, infraestrutura, segurança e consultoria de tecnologia para empresas de todo o Brasil. Base no Rio de Janeiro, desde 2011.',
+  description: HOME_DESCRIPTION,
   keywords: [
     'desenvolvimento de sistemas sob medida',
     'desenvolvimento de aplicativos mobile',
@@ -49,6 +53,8 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
   // Sem canonical global: cada rota define o seu (relativo) — evita que páginas
   // internas herdem o canonical da home e sejam tratadas como duplicata.
+  // openGraph/twitter abaixo são só fallback: rota com buildMetadata (lib/seo)
+  // substitui o objeto inteiro.
   appleWebApp: {
     capable: true,
     title: 'Icardcase',
@@ -64,13 +70,13 @@ export const metadata: Metadata = {
     title: 'Icardcase — Soluções web e mobile sob medida',
     description: 'Tecnologia sob medida para qualquer desafio do seu negócio. Atendimento nacional, base no Rio de Janeiro, desde 2011.',
     siteName: 'Icardcase',
-    images: [{ url: '/og-icardcase.png', width: 1200, height: 630, alt: 'Icardcase — Tecnologia que conecta, soluções que transformam' }],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Icardcase — Tecnologia sob medida para o seu negócio',
     description: 'Soluções web e mobile sob medida, segurança e consultoria. Atendimento nacional.',
-    images: ['/og-icardcase.png'],
+    images: [DEFAULT_OG_IMAGE.url],
   },
   robots: {
     index: true, follow: true,
@@ -105,48 +111,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* next/font faz self-host das fontes — não há preconnect a fazer pro Google.
             Removido o preconnect que o Lighthouse flagrou como "não utilizado". */}
+        {/* Organização com @id `${SITE.url}/#organization` — as páginas
+            referenciam esse nó (provider/publisher/creator) em vez de repetir. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'ProfessionalService',
-              '@id': siteUrl,
-              name: 'Icardcase',
-              legalName: 'J Oliver Serviços de Informática TI Ltda',
-              alternateName: 'Icardcase Tecnologia',
-              description: 'Desenvolvimento de sistemas web e mobile sob medida, infraestrutura, segurança e consultoria de tecnologia para empresas de todo o Brasil. Base no Rio de Janeiro, desde 2011.',
-              url: siteUrl,
-              logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-512x512.png`, width: 512, height: 512 },
-              image: `${siteUrl}/og-icardcase.png`,
-              telephone: '+55-21-98878-5170',
-              email: 'contatos@icardcase.com.br',
-              foundingDate: '2011',
-              taxID: '13.437.391/0001-58',
-              address: {
-                '@type': 'PostalAddress',
-                streetAddress: 'Rua Bahia, 43',
-                addressLocality: 'Niterói',
-                addressRegion: 'RJ',
-                postalCode: '24330-440',
-                addressCountry: 'BR',
-              },
-              areaServed: { '@type': 'Country', name: 'Brasil' },
-              priceRange: '$$$',
-              sameAs: ['https://linkedin.com/company/icardcase', 'https://www.instagram.com/icardcase/'],
-              founder: {
-                '@type': 'Person',
-                name: 'Jadir Luiz de Oliveira Junior',
-                jobTitle: 'CEO & Founder',
-              },
-              makesOffer: [
-                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desenvolvimento de sistemas sob medida' } },
-                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Gestão de infraestrutura de TI' } },
-                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Suporte técnico e gestão de TI' } },
-                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Consultoria em LGPD e segurança' } },
-              ],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
         />
       </head>
       <body className="min-h-screen flex flex-col">

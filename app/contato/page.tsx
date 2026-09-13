@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { COMPANY, buildWhatsAppUrl } from '@/lib/constants'
 import { LeadForm } from '@/components/LeadForm'
+import { buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Contato — vamos conversar sobre seu projeto',
   description: `Fale com a ${COMPANY.name} sobre seu projeto de software, infraestrutura ou consultoria de TI. Atendimento nacional, base no Rio de Janeiro.`,
-  alternates: { canonical: '/contato' },
-}
+  path: '/contato',
+})
 
 export default function ContatoPage() {
   return (
@@ -48,7 +49,7 @@ export default function ContatoPage() {
                 Ou e-mail:{' '}
                 <a
                   href={`mailto:${COMPANY.contact.email}`}
-                  className="text-accent hover:text-accent-hover break-all link-underline"
+                  className="text-accent-text hover:text-ink break-all link-underline"
                 >
                   {COMPANY.contact.email}
                 </a>

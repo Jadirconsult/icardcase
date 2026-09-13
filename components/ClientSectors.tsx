@@ -1,6 +1,5 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
+import { yearsInBusiness } from '@/lib/constants'
+import { Reveal } from '@/components/Reveal'
 
 /**
  * Faixa de setores atendidos — padrão Vercel/Stripe quando não se tem
@@ -19,28 +18,8 @@ const sectors = [
 ] as const
 
 export function ClientSectors() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = ref.current
-    if (!node) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.2 },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [])
-
   return (
     <section
-      ref={ref}
       aria-labelledby="setores-title"
       className="relative bg-canvas py-14 border-t border-hairline"
     >
@@ -49,27 +28,17 @@ export function ClientSectors() {
           id="setores-title"
           className="section-kicker"
         >
-          Setores em produção · 14 anos
+          Setores em produção · {yearsInBusiness()} anos
         </p>
 
-        <div
-          className={`mt-6 flex flex-wrap items-center gap-x-8 gap-y-4 transition-all duration-700 ease-out ${
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
-          }`}
-        >
+        <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-4">
           {sectors.map((sector, i) => (
-            <div
-              key={sector}
-              className={`inline-flex items-center gap-2 transition-all duration-500 ease-out ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-              }`}
-              style={{ transitionDelay: `${80 + i * 60}ms` }}
-            >
+            <Reveal key={sector} delay={80 + i * 60} className="inline-flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-accent/70" aria-hidden="true" />
               <span className="font-mono text-[0.75rem] uppercase tracking-[0.12em] text-ink-muted">
                 {sector}
               </span>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Logo } from './Logo'
 import { buildWhatsAppUrl } from '@/lib/constants'
@@ -14,9 +14,12 @@ const nav = [
   { label: 'Sobre', href: '/sobre' },
 ]
 
+const MENU_ID = 'menu-mobile'
+
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const toggleRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 12)
@@ -24,6 +27,18 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Esc fecha o menu e devolve o foco ao botão que o abriu (WCAG 2.1.2 / 2.4.3).
+  useEffect(() => {
+    if (!mobileOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setMobileOpen(false)
+      toggleRef.current?.focus()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [mobileOpen])
 
   return (
     <header
@@ -35,9 +50,10 @@ export function Header() {
       )}
     >
       <nav className="container-content flex h-16 items-center justify-between" aria-label="Navegação principal">
-        <Link href="/" aria-label="Página inicial" className="flex items-center gap-2.5 group">
+        {/* aria-label começa pelo texto visível ("icardcase") — WCAG 2.5.3 */}
+        <Link href="/" aria-label="icardcase — página inicial" className="flex items-center gap-2.5 group">
           <Logo variant="dark" />
-          <span className="hidden sm:inline-flex font-mono text-[0.65rem] uppercase tracking-[0.18em] text-ink-tertiary group-hover:text-ink-subtle transition-colors">
+          <span className="hidden sm:inline-flex font-mono text-[0.65rem] uppercase tracking-[0.18em] text-ink-tertiary group-hover:text-ink-subtle transition-colors" aria-hidden="true">
             v.2026
           </span>
         </Link>
@@ -58,7 +74,7 @@ export function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/contato"
-            className="text-sm text-ink-muted hover:text-ink transition-colors"
+            className="nav-link text-sm"
           >
             Contato
           </Link>
@@ -83,14 +99,17 @@ export function Header() {
           </a>
         </div>
 
+        {/* 44×44 (h-11 w-11): antes era p-2 + ícone 22px = 38px de alvo */}
         <button
+          ref={toggleRef}
           type="button"
-          className="lg:hidden text-ink p-2"
+          className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-1 lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Fechar menu' : 'Abrir menu'}
           aria-expanded={mobileOpen}
+          aria-controls={MENU_ID}
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             {mobileOpen ? (
               <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" />
             ) : (
@@ -100,46 +119,46 @@ export function Header() {
         </button>
       </nav>
 
-      {mobileOpen && (
-        <div className="lg:hidden bg-canvas border-t border-hairline">
-          <ul className="container-content py-5 space-y-1">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-2.5 text-ink-muted hover:text-ink"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-            {/* /contato so existia no bloco `hidden lg:flex` acima: no celular
-                o formulario — caminho de conversao de peso igual ao WhatsApp —
-                nao existia na navegacao, e so era alcancavel rolando ate o
-                rodape. Aqui ele leva o primario porque o WhatsApp ja aparece
-                em outros cinco pontos da home mais o botao flutuante; quem
-                prefere resposta imediata continua a um toque de distancia. */}
-            <li className="space-y-2 pt-4">
+      {/* Sempre no DOM (com `hidden` quando fechado) para o aria-controls
+          apontar para um id que existe. */}
+      <div id={MENU_ID} hidden={!mobileOpen} className="lg:hidden bg-canvas border-t border-hairline">
+        <ul className="container-content py-5 space-y-1">
+          {nav.map((item) => (
+            <li key={item.href}>
               <Link
-                href="/contato"
+                href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="btn-primary w-full"
+                className="flex min-h-[44px] items-center text-ink-muted hover:text-ink"
               >
-                Falar com a Icardcase
+                {item.label}
               </Link>
-              <a
-                href={buildWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary w-full"
-              >
-                Conversar no WhatsApp
-              </a>
             </li>
-          </ul>
-        </div>
-      )}
+          ))}
+          {/* /contato so existia no bloco `hidden lg:flex` acima: no celular
+              o formulario — caminho de conversao de peso igual ao WhatsApp —
+              nao existia na navegacao, e so era alcancavel rolando ate o
+              rodape. Aqui ele leva o primario porque o WhatsApp ja aparece
+              em outros cinco pontos da home mais o botao flutuante; quem
+              prefere resposta imediata continua a um toque de distancia. */}
+          <li className="space-y-2 pt-4">
+            <Link
+              href="/contato"
+              onClick={() => setMobileOpen(false)}
+              className="btn-primary btn-block"
+            >
+              Falar com a Icardcase
+            </Link>
+            <a
+              href={buildWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary btn-block"
+            >
+              Conversar no WhatsApp
+            </a>
+          </li>
+        </ul>
+      </div>
     </header>
   )
 }

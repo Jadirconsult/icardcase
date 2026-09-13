@@ -1,23 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
-import { buildWhatsAppUrl, SITE } from '@/lib/constants'
+import { buildWhatsAppUrl, SITE, yearsInBusiness } from '@/lib/constants'
+import { buildMetadata, organizationRef } from '@/lib/seo'
 
 const PAGE_URL = `${SITE.url}/desenvolvimento-de-sistemas`
 
-export const metadata: Metadata = {
-  title: 'Desenvolvimento de Sistemas Sob Medida · Web e Mobile no Brasil',
+export const metadata: Metadata = buildMetadata({
+  title: 'Desenvolvimento de Sistemas Sob Medida',
   description:
-    'Desenvolvimento de sistemas web e mobile sob medida para empresas em todo o Brasil. ERPs, plataformas multi-tenant, integração SEFAZ, automação de processos. CEO no projeto, sem terceirização.',
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Desenvolvimento de Sistemas Sob Medida · Icardcase',
-    description:
-      'Sistemas web e mobile sob medida para empresas no Brasil — ERPs, multi-tenant, integração SEFAZ. CEO no projeto, sem call center.',
-    url: PAGE_URL,
-    type: 'website',
-  },
-}
+    'Desenvolvimento de sistemas web e mobile sob medida para empresas no Brasil: ERPs, multi-tenant, integração SEFAZ. CEO no projeto, sem terceirização.',
+  path: '/desenvolvimento-de-sistemas',
+})
 
 const faq = [
   {
@@ -38,11 +32,13 @@ const faq = [
   },
   {
     q: 'O que diferencia vocês de uma agência de software?',
-    a: 'Três coisas. Primeiro: quem fecha contigo executa. Não tem trainee aprendendo no seu projeto, não tem freelancer terceirizado. Segundo: 14 anos de mercado e 15 anos prévios em infraestrutura crítica (Vale, Camargo Corrêa, EFVM) — sabemos o que é prazo apertado e sistema de missão crítica. Terceiro: ticket alto, poucos clientes por ano — cada projeto tem atenção real, não está numa fila de 50 contas paralelas.',
+    a: `Três coisas. Primeiro: quem fecha contigo executa. Não tem trainee aprendendo no seu projeto, não tem freelancer terceirizado. Segundo: ${yearsInBusiness()} anos de mercado e 15 anos prévios em infraestrutura crítica (Vale, Camargo Corrêa, EFVM) — sabemos o que é prazo apertado e sistema de missão crítica. Terceiro: ticket alto, poucos clientes por ano — cada projeto tem atenção real, não está numa fila de 50 contas paralelas.`,
   },
   {
     q: 'Vocês desenvolvem aplicativo mobile também?',
-    a: 'Sim. Stack React Native / Expo, publicação em App Store e Google Play, integração com sistemas backend que você já tem. Veja /desenvolvimento-mobile para detalhes.',
+    a: 'Sim. Stack React Native / Expo, publicação em App Store e Google Play, integração com sistemas backend que você já tem.',
+    // Link interno renderizado após a resposta (antes a rota aparecia só como texto)
+    link: { href: '/desenvolvimento-mobile', label: 'Veja os detalhes de desenvolvimento mobile' },
   },
 ]
 
@@ -51,12 +47,7 @@ export default function DesenvolvimentoDeSistemasPage() {
     '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: 'Desenvolvimento de Sistemas Sob Medida',
-    provider: {
-      '@type': 'Organization',
-      name: 'Icardcase',
-      url: SITE.url,
-      telephone: '+55-21-98878-5170',
-    },
+    provider: organizationRef,
     areaServed: { '@type': 'Country', name: 'Brasil' },
     description:
       'Desenvolvimento de sistemas web e mobile sob medida — ERPs, plataformas multi-tenant, integração SEFAZ, automação de processos para empresas em todo o Brasil.',
@@ -208,7 +199,7 @@ export default function DesenvolvimentoDeSistemasPage() {
               ].map((step) => (
                 <li key={step.num} className="py-8 border-b border-hairline">
                   <div className="flex gap-6">
-                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent pt-1">
+                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent-text pt-1">
                       {step.num}
                     </span>
                     <div>
@@ -279,7 +270,7 @@ export default function DesenvolvimentoDeSistemasPage() {
                   <p className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-ink-tertiary">{c.segment}</p>
                   <h3 className="mt-3 text-headline text-ink">{c.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-ink-subtle">{c.desc}</p>
-                  <p className="mt-5 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent">
+                  <p className="mt-5 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-accent-text">
                     Ver case →
                   </p>
                 </Link>
@@ -302,10 +293,10 @@ export default function DesenvolvimentoDeSistemasPage() {
               <li key={i} className="border-b border-hairline">
                 <details className="group py-6">
                   <summary className="flex cursor-pointer items-start justify-between gap-6 list-none">
-                    <h3 className="text-headline text-ink group-open:text-accent transition-colors">
+                    <h3 className="text-headline text-ink group-open:text-accent-text transition-colors">
                       {item.q}
                     </h3>
-                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent group-open:rotate-45 transition-transform">
+                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent-text group-open:rotate-45 transition-transform">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 5v14M5 12h14" strokeLinecap="round" />
                       </svg>
@@ -313,6 +304,15 @@ export default function DesenvolvimentoDeSistemasPage() {
                   </summary>
                   <p className="mt-4 max-w-[68ch] text-base leading-relaxed text-ink-subtle">
                     {item.a}
+                    {item.link && (
+                      <>
+                        {' '}
+                        <Link href={item.link.href} className="underline underline-offset-4 hover:text-ink">
+                          {item.link.label}
+                        </Link>
+                        .
+                      </>
+                    )}
                   </p>
                 </details>
               </li>

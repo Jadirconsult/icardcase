@@ -44,7 +44,7 @@ export function AnimatedCounter({
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
-      setCurrent(to)
+      // Estado inicial já é `to`: nada a animar nem a setar.
       return
     }
 

@@ -2,21 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
 import { buildWhatsAppUrl, SITE } from '@/lib/constants'
+import { buildMetadata, organizationRef } from '@/lib/seo'
 
 const PAGE_URL = `${SITE.url}/desenvolvimento-mobile`
 
-export const metadata: Metadata = {
-  title: 'Desenvolvimento de Aplicativo Mobile Sob Medida · iOS e Android',
+export const metadata: Metadata = buildMetadata({
+  title: 'Desenvolvimento de Aplicativos iOS e Android',
   description:
-    'Desenvolvimento de aplicativos mobile sob medida para empresas em todo o Brasil. React Native, Expo, integração com sistemas corporativos, publicação na App Store e Google Play.',
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Desenvolvimento de Aplicativo Mobile Sob Medida · Icardcase',
-    description: 'Aplicativos iOS e Android sob medida — React Native, Expo, integração com seu sistema.',
-    url: PAGE_URL,
-    type: 'website',
-  },
-}
+    'Desenvolvimento de aplicativos mobile sob medida para empresas de todo o Brasil: React Native, Expo, integração com seu sistema e publicação nas lojas.',
+  path: '/desenvolvimento-mobile',
+})
 
 const faq = [
   {
@@ -50,7 +45,7 @@ export default function DesenvolvimentoMobilePage() {
     '@context': 'https://schema.org',
     '@type': 'Service',
     serviceType: 'Desenvolvimento de Aplicativo Mobile Sob Medida',
-    provider: { '@type': 'Organization', name: 'Icardcase', url: SITE.url, telephone: '+55-21-98878-5170' },
+    provider: organizationRef,
     areaServed: { '@type': 'Country', name: 'Brasil' },
     description: 'Desenvolvimento de aplicativos mobile iOS e Android sob medida — React Native, Expo, integração com sistemas backend.',
     url: PAGE_URL,
@@ -134,7 +129,7 @@ export default function DesenvolvimentoMobilePage() {
               ].map((step) => (
                 <li key={step.num} className="py-8 border-b border-hairline">
                   <div className="flex gap-6">
-                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent pt-1">{step.num}</span>
+                    <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-accent-text pt-1">{step.num}</span>
                     <div>
                       <h3 className="text-headline text-ink">{step.title}</h3>
                       <p className="mt-3 text-base leading-relaxed text-ink-subtle max-w-[60ch]">{step.body}</p>
@@ -181,8 +176,8 @@ export default function DesenvolvimentoMobilePage() {
               <li key={i} className="border-b border-hairline">
                 <details className="group py-6">
                   <summary className="flex cursor-pointer items-start justify-between gap-6 list-none">
-                    <h3 className="text-headline text-ink group-open:text-accent transition-colors">{item.q}</h3>
-                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent group-open:rotate-45 transition-transform">
+                    <h3 className="text-headline text-ink group-open:text-accent-text transition-colors">{item.q}</h3>
+                    <span className="flex-shrink-0 mt-1 text-ink-subtle group-open:text-accent-text group-open:rotate-45 transition-transform">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 5v14M5 12h14" strokeLinecap="round" />
                       </svg>

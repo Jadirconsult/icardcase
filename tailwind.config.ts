@@ -19,16 +19,17 @@ const config: Config = {
         'hairline-strong': '#2A3F75',
         'hairline-tertiary': '#34487F',
 
+        // Borda de campo de formulário. hairline (1.6:1) some sobre surface-1;
+        // WCAG 1.4.11 pede 3:1 para o limite de um controle. #64748B dá
+        // 3.36:1 no surface-1 e 4.0:1 no canvas — é o cinza da identidade.
+        'hairline-input': '#64748B',
+
         // ─── Texto ────────────────────────────────────────────────────────
         ink: {
           DEFAULT: '#F8FAFC',        // body principal
           muted: '#D6DDE8',          // secundário
           subtle: '#AAB4C4',         // terciário (contraste AA reforçado)
           tertiary: '#8D99AB',       // quaternário (contraste AA reforçado)
-          100: '#EAF1FF',            // light surface (light mode raro)
-          400: '#64748B',            // backward-compat
-          900: '#081F4D',            // backward-compat
-          50: '#F8FAFC',
         },
 
         // ─── Accent (uso escasso) ─────────────────────────────────────────
@@ -42,14 +43,19 @@ const config: Config = {
           text: '#60A5FA',
         },
 
-        // ─── Backward-compat tokens (usados pelos componentes existentes) ─
-        surface: { DEFAULT: '#F8FAFC', alt: '#EAF1FF' },
-        muted: '#64748B',
-        brand: {
-          navy: '#081F4D',
-          blue: { DEFAULT: '#2563EB', light: '#EAF1FF' },
-          gray: { DEFAULT: '#64748B', bg: '#F8FAFC' },
-        },
+        // ─── Feedback semântico ───────────────────────────────────────────
+        // Mesmo contrato do accent: DEFAULT para preenchimento/borda (use com
+        // alpha: bg-danger/10, border-danger/40), `text` para tipografia e
+        // ícone. Os `text` passam AA no canvas e no surface-1
+        // (danger 5.8:1, warning 9.6:1, success 8.1:1 no surface-1).
+        danger: { DEFAULT: '#EF4444', text: '#F87171' },
+        warning: { DEFAULT: '#F59E0B', text: '#FBBF24' },
+        success: { DEFAULT: '#10B981', text: '#34D399' },
+
+        // Tokens backward-compat (surface.DEFAULT claro, muted, brand.*,
+        // ink.100/400/900/50) removidos em 09/2026: zero uso em app/,
+        // components/ e lib/ — e `bg-surface` gerava um fundo #F8FAFC que
+        // parecia fazer parte da escada navy.
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
@@ -63,14 +69,6 @@ const config: Config = {
         // Antes indefinida: o texto renderizava a 1280px (~130ch, ilegível).
         'prose-wide': '42rem',
       },
-      letterSpacing: {
-        'tracking-display-xl': '-0.04em',
-        'tracking-display-lg': '-0.032em',
-        'tracking-display-md': '-0.025em',
-        'tracking-headline': '-0.022em',
-        'wide-2': '0.1em',
-        'eyebrow': '0.05em',
-      },
       fontSize: {
         // Piso subido de 2.75rem para 3.25rem: o termo fluido 7.5vw so alcancava
         // o piso antigo a 587px, entao TODO telefone renderizava a 44px e o
@@ -83,40 +81,28 @@ const config: Config = {
         'display-md': ['clamp(1.875rem, 3.4vw, 2.75rem)', { lineHeight: '1.12', letterSpacing: '-0.03em', fontWeight: '600' }],
         'headline': ['clamp(1.5rem, 2.4vw, 1.875rem)', { lineHeight: '1.18', letterSpacing: '-0.024em', fontWeight: '600' }],
         'card-title': ['1.375rem', { lineHeight: '1.25', letterSpacing: '-0.015em', fontWeight: '500' }],
-        'subhead': ['1.25rem', { lineHeight: '1.40', letterSpacing: '-0.008em', fontWeight: '400' }],
         'body-lg': ['1.125rem', { lineHeight: '1.50', letterSpacing: '-0.004em', fontWeight: '400' }],
-        'eyebrow': ['0.8125rem', { lineHeight: '1.30', letterSpacing: '0.05em', fontWeight: '500' }],
-        hero: ['clamp(2.75rem, 7.5vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.045em', fontWeight: '600' }],
-        h2: ['clamp(2.25rem, 5vw, 4.25rem)', { lineHeight: '1.05', letterSpacing: '-0.038em', fontWeight: '600' }],
+        // subhead, eyebrow, hero e h2 removidos em 09/2026: sem uso (hero/h2
+        // eram cópias antigas de display-xl/display-lg).
       },
       keyframes: {
-        'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(28px)' },
+        // Entrada do Hero. Roda só em CSS, com fill-mode `both`: o elemento
+        // fica no estado 0% durante o delay (sem flash) e o texto existe no
+        // HTML mesmo sem JS. O reset de reduced-motion no globals.css zera
+        // duração e delay.
+        enter: {
+          '0%': { opacity: '0', transform: 'translateY(0.75rem)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-6px)' },
         },
         'pulse-ring': {
           '0%': { transform: 'scale(0.9)', opacity: '0.6' },
           '100%': { transform: 'scale(1.6)', opacity: '0' },
         },
-        'gradient-shift': {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-        },
       },
       animation: {
-        'fade-up': 'fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-        'fade-in': 'fade-in 0.6s ease-out forwards',
-        float: 'float 3.5s ease-in-out infinite',
+        enter: 'enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both',
         'pulse-ring': 'pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'gradient-shift': 'gradient-shift 12s ease-in-out infinite',
+        // fade-up, fade-in, float e gradient-shift removidos: sem uso.
       },
     },
   },

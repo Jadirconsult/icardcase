@@ -1,6 +1,4 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
+import { Reveal } from '@/components/Reveal'
 
 const risks = [
   {
@@ -18,38 +16,12 @@ const risks = [
 ]
 
 export function DataUnification() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = sectionRef.current
-    if (!node) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -80px 0px' },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [])
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-hidden bg-canvas section-y border-t border-hairline"
-    >
+    <section className="relative overflow-hidden bg-canvas section-y border-t border-hairline">
       <div className="bg-mesh absolute inset-0 pointer-events-none opacity-50" aria-hidden="true" />
 
       <div className="container-content relative">
-        <div
-          className={`max-w-3xl mb-16 lg:mb-20 transition-all duration-700 ease-out ${
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-        >
+        <Reveal className="max-w-3xl mb-16 lg:mb-20">
           <p className="section-kicker">Superfície oculta de risco</p>
           <h2
             aria-label="Dados fragmentados não são só desorganização. São exposição."
@@ -64,38 +36,29 @@ export function DataUnification() {
             esquecidos, PDFs baixados fora do sistema. Cada arquivo espalhado é ponto
             de falha em três dimensões que sua auditoria não perdoa.
           </p>
-        </div>
+        </Reveal>
 
         <ul className="grid grid-cols-1 gap-px bg-hairline border border-hairline rounded-xl overflow-hidden sm:grid-cols-3 mb-16">
           {risks.map((r, i) => (
-            <li
-              key={r.title}
-              className={`group relative card-glow bg-canvas p-7 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-surface-1 ${
-                visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
-              }`}
-              style={{ transitionDelay: `${200 + i * 120}ms` }}
-            >
-              {/* linha de destaque no topo, revela no hover (mesmo motif dos cards de Serviços) */}
-              <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                aria-hidden="true"
-              />
-              <h3 className="text-card-title text-ink leading-snug mb-3 transition-colors duration-300 group-hover:text-accent">
-                {r.title}
-              </h3>
-              <p className="text-sm leading-[1.55] text-ink-subtle">{r.desc}</p>
-            </li>
+            <Reveal key={r.title} as="li" variant="rise" delay={200 + i * 120} className="bg-canvas">
+              <div className="group relative card-glow h-full bg-canvas p-7 transition-colors duration-500 hover:bg-surface-1">
+                {/* linha de destaque no topo, revela no hover (mesmo motif dos cards de Serviços) */}
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
+                <h3 className="text-card-title text-ink leading-snug mb-3 transition-colors duration-300 group-hover:text-accent-text">
+                  {r.title}
+                </h3>
+                <p className="text-sm leading-[1.55] text-ink-subtle">{r.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </ul>
 
-        <div
-          className={`max-w-[58ch] transition-all duration-700 ease-out ${
-            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-          style={{ transitionDelay: '560ms' }}
-        >
+        <Reveal delay={560} className="max-w-[58ch]">
           <p className="text-lg leading-[1.55] text-ink-muted">
-            A saída não é 'mais treinamento de equipe' nem 'nova pasta organizada'. É
+            A saída não é &apos;mais treinamento de equipe&apos; nem &apos;nova pasta organizada&apos;. É
             infraestrutura: sistema único com <strong className="text-ink font-medium">RLS no banco</strong>,
             <strong className="text-ink font-medium"> audit log imutável</strong>,
             <strong className="text-ink font-medium"> controle de acesso por papel</strong> e
@@ -120,7 +83,7 @@ export function DataUnification() {
               </svg>
             </a>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

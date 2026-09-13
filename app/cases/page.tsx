@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FinalCTA } from '@/components/FinalCTA'
+import { buildMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: 'Cases: sistemas sob medida em produção',
   description: 'Cases reais da Icardcase: ERP industrial, migração de legado, SaaS fiscal e infraestrutura crítica para empresas de todo o Brasil.',
-  alternates: { canonical: '/cases' },
-}
+  path: '/cases',
+})
 
 const allCases = [
   { slug: 'syspershy', segment: 'INDÚSTRIA QUÍMICA', title: 'SYSPERSHY — ERP completo', description: '94 tabelas, 49 telas, 60 migrações.' },
@@ -38,7 +39,7 @@ export default function CasesPage() {
               >
                 <div className="edge-highlight absolute inset-0 rounded-xl" aria-hidden="true" />
                 <div className="relative flex items-start justify-between mb-6">
-                  <span className="font-mono text-[0.7rem] tracking-[0.12em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent">
+                  <span className="font-mono text-[0.7rem] tracking-[0.12em] text-ink-tertiary transition-colors duration-300 group-hover:text-accent-text">
                     {c.segment}
                   </span>
                   <svg
@@ -48,13 +49,13 @@ export default function CasesPage() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="1.5"
-                    className="flex-shrink-0 text-ink-tertiary transition-all duration-500 group-hover:text-accent group-hover:translate-x-1 group-hover:-translate-y-1"
+                    className="flex-shrink-0 text-ink-tertiary transition-all duration-500 group-hover:text-accent-text group-hover:translate-x-1 group-hover:-translate-y-1"
                     aria-hidden="true"
                   >
                     <path d="M7 17L17 7M7 7h10v10" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <h2 className="relative text-headline text-ink mb-3 transition-colors duration-300 group-hover:text-accent">
+                <h2 className="relative text-headline text-ink mb-3 transition-colors duration-300 group-hover:text-accent-text">
                   {c.title}
                 </h2>
                 <p className="relative text-sm leading-relaxed text-ink-subtle">

@@ -7,10 +7,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/admin/'],
+        // /_next/ fica liberado: o Google precisa do CSS/JS para renderizar a
+        // página. Bloquear fazia o crawler ver o site sem estilo nem conteúdo client.
+        disallow: ['/api/', '/admin/'],
       },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,
-    host: SITE.url,
   }
 }

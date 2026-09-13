@@ -62,7 +62,11 @@
     *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
+      /* Delay também: com fill-mode both (animate-enter) ou stagger de
+         transição, o elemento ficaria invisível durante o atraso. */
+      animation-delay: 0ms !important;
       transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
       scroll-behavior: auto !important;
     }
   }
@@ -78,13 +82,13 @@
      <select> aceita Tailwind, mas <option> é renderizada pelo SO/browser e
      ignora estilo do pai — daí o painel branco com texto cinza no dark. */
   select option {
-    background-color: #081F4D;
-    color: #F8FAFC;
+    background-color: theme('colors.surface-1');
+    color: theme('colors.ink.DEFAULT');
   }
   select option:checked,
   select option:hover {
-    background-color: #163972;
-    color: #F8FAFC;
+    background-color: theme('colors.surface-4');
+    color: theme('colors.ink.DEFAULT');
   }
 }
 
@@ -143,6 +147,69 @@
     @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-5 py-3 text-sm font-medium text-white transition-all duration-200 hover:border-white/40 hover:bg-white/5;
   }
 
+  /* Modificadores — combinam com qualquer .btn-* */
+  .btn-lg {
+    @apply min-h-[52px] px-8 py-3.5 text-base;
+  }
+  .btn-block {
+    @apply w-full;
+  }
+
+  /* Disabled / aria-disabled. Prefira aria-disabled em botão que já tem
+     foco (ex.: submit enquanto envia): `disabled` tira o elemento da ordem de
+     tabulação e o foco cai no body. Seletores com :hover para anular o hover
+     do @apply acima, que tem a mesma especificidade. */
+  .btn-primary:disabled,
+  .btn-primary[aria-disabled='true'],
+  .btn-primary:disabled:hover,
+  .btn-primary[aria-disabled='true']:hover {
+    @apply cursor-not-allowed bg-surface-2 text-ink-subtle;
+    box-shadow: none;
+  }
+  .btn-secondary:disabled,
+  .btn-secondary[aria-disabled='true'],
+  .btn-ghost-dark:disabled,
+  .btn-ghost-dark[aria-disabled='true'],
+  .btn-ghost-light:disabled,
+  .btn-ghost-light[aria-disabled='true'] {
+    @apply cursor-not-allowed opacity-60;
+  }
+  .btn-secondary:disabled:hover,
+  .btn-secondary[aria-disabled='true']:hover {
+    @apply border-hairline bg-surface-1;
+  }
+  .btn-ghost-dark:disabled:hover,
+  .btn-ghost-dark[aria-disabled='true']:hover {
+    @apply border-hairline bg-transparent;
+  }
+  .btn-ghost-light:disabled:hover,
+  .btn-ghost-light[aria-disabled='true']:hover {
+    @apply border-white/20 bg-transparent;
+  }
+
+  /* ─── Campo de formulário ────────────────────────────────────────── */
+  /* Borda hairline-input (3.36:1 no surface-1, WCAG 1.4.11). Foco com anel
+     accent-text sólido: o antigo `focus:outline-none` + ring accent/30
+     compunha ~1.9:1 e sumia sobre o card. */
+  .field-input {
+    @apply block w-full min-h-[44px] rounded-md border border-hairline-input bg-surface-1 px-4 py-2.5 text-ink transition-colors duration-200 placeholder:text-ink-tertiary hover:border-ink-tertiary;
+  }
+  .field-input:focus-visible {
+    @apply border-accent-text;
+    outline: 2px solid theme('colors.accent.text');
+    outline-offset: 2px;
+    border-radius: theme('borderRadius.md');
+  }
+  .field-input[aria-invalid='true'] {
+    @apply border-danger-text;
+  }
+  .field-input:disabled {
+    @apply cursor-not-allowed opacity-60 hover:border-hairline-input;
+  }
+  .field-error {
+    @apply mt-1.5 text-xs text-danger-text;
+  }
+
   /* Nav link com hit area mínima 44px sem inchar visualmente */
   .nav-link {
     @apply inline-flex min-h-[44px] items-center text-ink-muted hover:text-ink transition-colors;
@@ -182,29 +249,51 @@
     pointer-events: none;
     z-index: 0;
   }
+  /* Sem filter: blur(90px). O blur em pseudo-elemento de 60% da seção,
+     animado em loop, forçava re-rasterização de uma camada enorme a cada
+     frame (pior em GPU de celular). A suavidade agora vem do próprio
+     gradiente: caixa maior + várias paradas até zero na borda (closest-side),
+     o que imita a borda difusa que o blur produzia. */
   .aurora::before,
   .aurora::after {
     content: '';
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
-    will-change: transform;
   }
   .aurora::before {
-    top: -15%;
-    left: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.35) 0%, rgba(37, 99, 235, 0) 70%);
-    animation: aurora-drift-a 18s ease-in-out infinite;
+    top: -30%;
+    left: -22%;
+    width: 84%;
+    height: 90%;
+    background: radial-gradient(
+      closest-side,
+      rgba(37, 99, 235, 0.3) 0%,
+      rgba(37, 99, 235, 0.2) 30%,
+      rgba(37, 99, 235, 0.08) 62%,
+      rgba(37, 99, 235, 0) 100%
+    );
   }
   .aurora::after {
-    bottom: -15%;
-    right: -8%;
-    width: 55%;
-    height: 55%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.28) 0%, rgba(59, 130, 246, 0) 70%);
-    animation: aurora-drift-b 22s ease-in-out infinite;
+    bottom: -30%;
+    right: -20%;
+    width: 78%;
+    height: 84%;
+    background: radial-gradient(
+      closest-side,
+      rgba(59, 130, 246, 0.24) 0%,
+      rgba(59, 130, 246, 0.15) 30%,
+      rgba(59, 130, 246, 0.06) 62%,
+      rgba(59, 130, 246, 0) 100%
+    );
+  }
+  /* Drift só a partir de md: no celular o glow fica parado (bateria/GPU). */
+  @screen md {
+    .aurora::before {
+      animation: aurora-drift-a 18s ease-in-out infinite;
+    }
+    .aurora::after {
+      animation: aurora-drift-b 22s ease-in-out infinite;
+    }
   }
   @keyframes aurora-drift-a {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
@@ -214,6 +303,33 @@
   @keyframes aurora-drift-b {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
     50%      { transform: translate3d(-14%, -8%, 0) scale(1.15); }
+  }
+
+  /* ─── Grid fino do Hero (fade radial a partir do topo) ─────────── */
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 70%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+
+  /* ─── Reveal (components/Reveal.tsx) ─────────────────────────────── */
+  /* Estado base = visível. Só `data-reveal="pending"` (posto pelo client,
+     para o que está abaixo da dobra) esconde. Sem JS, nada some. */
+  .reveal[data-reveal='pending'] {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+  .reveal-rise[data-reveal='pending'] {
+    transform: translate3d(0, 2.5rem, 0) scale(0.97);
+  }
+  .reveal[data-reveal='shown'] {
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
   }
 
   /* ─── Card glow on hover ─ gradient border + inner spot ─────────── */
@@ -316,8 +432,9 @@
   .prose-icardcase p {
     @apply text-base md:text-lg text-ink-muted leading-relaxed mb-5;
   }
+  /* accent-text: o accent cru (#2563EB) dava 3.1:1 como texto no canvas. */
   .prose-icardcase a {
-    @apply text-accent hover:text-accent-hover transition-colors;
+    @apply text-accent-text underline-offset-4 hover:text-ink hover:underline transition-colors;
   }
   .prose-icardcase ul {
     @apply list-disc list-outside space-y-2 mb-5 pl-5 text-ink-muted;
@@ -339,7 +456,7 @@
     @apply mb-0;
   }
   .prose-icardcase code {
-    @apply bg-surface-2 text-accent px-1.5 py-0.5 rounded text-sm font-mono;
+    @apply bg-surface-2 text-accent-text px-1.5 py-0.5 rounded text-sm font-mono;
   }
 }
 

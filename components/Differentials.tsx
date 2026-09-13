@@ -1,6 +1,5 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
+import { yearsInBusiness } from '@/lib/constants'
+import { Reveal } from '@/components/Reveal'
 
 const points = [
   {
@@ -30,30 +29,8 @@ const points = [
 ]
 
 export function Differentials() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const node = sectionRef.current
-    if (!node) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [])
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative bg-canvas section-y border-t border-hairline"
-    >
+    <section className="relative bg-canvas section-y border-t border-hairline">
       <div className="container-content relative">
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-12 items-start">
           {/* Coluna texto — 5/12 */}
@@ -64,7 +41,7 @@ export function Differentials() {
               <span className="block text-ink-muted">não suporte de gravata.</span>
             </h2>
             <p className="mt-8 text-lg leading-[1.55] text-ink-muted max-w-[42ch]">
-              Quem assina o contrato é quem executa. Sem terceirização, sem júnior aprendendo no seu cliente. CEO no projeto, 14 anos no mercado.
+              Quem assina o contrato é quem executa. Sem terceirização, sem júnior aprendendo no seu cliente. CEO no projeto, {yearsInBusiness()} anos no mercado.
             </p>
             <p className="mt-5 text-base leading-relaxed text-ink-subtle max-w-[42ch]">
               Antes disso, 15 anos em infraestrutura pesada: ferrovia Carajás, EFVM, mineração, projetos da Vale e Camargo Corrêa. Esse repertório ensina o que é sistema crítico — e a gente aplica esse rigor à tecnologia.
@@ -74,21 +51,15 @@ export function Differentials() {
           {/* Coluna pontos — 7/12 */}
           <ul className="lg:col-span-7 space-y-px border-t border-hairline">
             {points.map((p, i) => (
-              <li
-                key={p.title}
-                className={`group relative transition-all duration-500 ease-out ${
-                  visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ transitionDelay: `${i * 120}ms` }}
-              >
+              <Reveal key={p.title} as="li" delay={i * 120} className="group relative">
                 <div className="flex gap-6 py-8 border-b border-hairline transition-colors duration-300 group-hover:border-hairline-strong">
                   {/* Número editorial mono */}
-                  <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-ink-tertiary pt-2 transition-colors duration-300 group-hover:text-accent">
+                  <span className="flex-shrink-0 font-mono text-xs tracking-[0.1em] text-ink-tertiary pt-2 transition-colors duration-300 group-hover:text-accent-text">
                     {p.num}
                   </span>
 
                   <div className="flex-1">
-                    <h3 className="text-headline text-ink transition-colors duration-300 group-hover:text-accent">
+                    <h3 className="text-headline text-ink transition-colors duration-300 group-hover:text-accent-text">
                       {p.title}
                     </h3>
                     <p className="mt-3 text-base leading-relaxed text-ink-subtle max-w-[58ch]">
@@ -96,9 +67,9 @@ export function Differentials() {
                     </p>
                   </div>
 
-                  {/* Indicador hover lateral */}
+                  {/* Indicador hover lateral (decorativo) */}
                   <span
-                    className="flex-shrink-0 self-center text-ink-tertiary opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-accent"
+                    className="flex-shrink-0 self-center text-ink-tertiary opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-accent-text"
                     aria-hidden="true"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -106,7 +77,7 @@ export function Differentials() {
                     </svg>
                   </span>
                 </div>
-              </li>
+              </Reveal>
             ))}
           </ul>
         </div>
